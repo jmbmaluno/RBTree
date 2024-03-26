@@ -3,18 +3,32 @@
 
 using namespace std;
 
+
 class ArvoreRN{
+
+    template <typename T>
+    struct Noh;
+
+    //Estrutura do Mod
+    template <typename T>
+    struct Mod {int versao; char campo; T valor;};
+    
+    
     //Estrutura do noh
-    struct Noh {int chave; char cor; Noh* esq; Noh* dir; Noh* pai;};
+    //Os campos de retorno e formado por apenas um no, ja que em uma arvore, cada no recebe em apontado por no max 1 ponteiro
+    //Portanto, o campo de modificações terá apenas 2 espaços
+    template <typename T>
+    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Mod<T> Mods[2];};
 
     //Criando um nó sentinela, assim como o Cormen
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
-    Noh sentinela;
+    Noh<int> sentinela;
 
 
     //Rotação ensinada pelo Cormen
+    template <typename T>
     void rotacionar_esq(Noh* x){
-        Noh* y = x->dir;
+        Noh<T>* y = x->dir;
         x->dir = y->esq;
 
         if(y->esq != &sentinela){
@@ -247,7 +261,9 @@ class ArvoreRN{
 
 
     void inserir(int k){
-        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela};
+        Mod m = {-1,'n',0,&sentinela, 'n'};
+        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {m,m}};
+
 
         Noh *y = &sentinela;
         Noh *x = raiz();
@@ -362,6 +378,25 @@ class ArvoreRN{
         return y->chave;
     }
 
+    template <typename T>
+    T ler(Noh* n, char campo, int v){
+        
+        T resposta = n->chave;
+        int j = 0;
+        int v_aux = 0;
+        
+
+        for (int i = 0; i < 2; i++){
+            if(n->Mods[i].campo == campo && n->Mods[i].versao <= v && n->Mods[i].versao > v_aux){
+                j = i;
+                v_aux = n->Mods[i].versao;
+            }
+        }
+
+
+        return resposta;
+    }
+    
 
     //Destrutor da árvore
     void Deletar(Noh* r){
@@ -394,5 +429,5 @@ int main(){
     cout << "\n\n";
 
     T.imprimir();
-    cout << T.sucessor(2) << "\n";
+    cout << T.ler<int>(T.raiz(), 'k', 0) << "\n";
 }
