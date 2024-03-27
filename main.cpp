@@ -36,8 +36,38 @@ class ArvoreRN{
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
     Noh sentinela;
 
+    Valor ler(Noh* n, Tag campo, int v){
+        
+        Valor resposta;
 
+        switch(campo){
+            case CHAVE: resposta.k = n->chave; break;
+            case COR:   resposta.c = n->cor;   break;
+            case PAI:   resposta.p = n->pai;   break;
+            case ESQ:   resposta.p = n->esq;   break;
+            case DIR:   resposta.p = n->dir;   break;
+        };
 
+        int j = 0;
+        int v_aux = 0;
+
+        for(int i = 0; i < QTDE_MODS; i++){
+            if(n->Mods[i].tag == campo and n->Mods[i].versao <= v and n->Mods[i].versao > v_aux){
+                v_aux = n->Mods[i].versao;
+                j = i;
+            }
+        }
+
+        if(j != 0){
+            switch(campo){
+                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
+                case COR:   resposta.c = n->Mods[j].valor.c;   break;
+                default:    resposta.p = n->Mods[j].valor.p;   break;
+            }
+        }
+
+        return resposta;
+    }
 
     //Rotação ensinada pelo Cormen
     void rotacionar_esq(Noh* x){
@@ -84,16 +114,18 @@ class ArvoreRN{
     }
 
 
-    void imprimir_rec(Noh* r){
+    void imprimir_rec(Noh* r, int &v){
 
-        if(r->esq != &sentinela){
-            imprimir_rec(r->esq);
+
+
+        if(ler(r, {ESQ}, v).p  != &sentinela){
+            imprimir_rec(ler(r, {ESQ}, v).p, v);
         }
 
-        cout << "Chave: " << r->chave << " Cor: " << r->cor << "\n";
+        cout << "Chave: " << ler(r, {CHAVE}, v).k << " Cor: " << ler(r, {COR}, v).k << "\n";
 
-        if(r->dir != &sentinela){
-            imprimir_rec(r->dir);
+        if(ler(r, {DIR}, v).p != &sentinela){
+            imprimir_rec(ler(r, {DIR}, v).p, v);
         }
     }
 
@@ -270,39 +302,6 @@ class ArvoreRN{
         }
     }
 
-    Valor ler(Noh* n, Tag campo, int v){
-        
-        Valor resposta;
-
-        switch(campo){
-            case CHAVE: resposta.k = n->chave; break;
-            case COR:   resposta.c = n->cor;   break;
-            case PAI:   resposta.p = n->pai;   break;
-            case ESQ:   resposta.p = n->esq;   break;
-            case DIR:   resposta.p = n->dir;   break;
-        };
-
-        int j = 0;
-        int v_aux = 0;
-
-        for(int i = 0; i < QTDE_MODS; i++){
-            if(n->Mods[i].tag == campo and n->Mods[i].versao <= v and n->Mods[i].versao > v_aux){
-                v_aux = n->Mods[i].versao;
-                j = i;
-            }
-        }
-
-        if(j != 0){
-            switch(campo){
-                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
-                case COR:   resposta.c = n->Mods[j].valor.c;   break;
-                default:    resposta.p = n->Mods[j].valor.p;   break;
-            }
-        }
-
-        return resposta;
-    }
-
     void inserir(int k, int& v){
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}};
 
@@ -326,6 +325,7 @@ class ArvoreRN{
         if(y == &sentinela){
             sentinela.pai = n;
             raiz_versao[v] = n; 
+            cout << v << "\n";
         }
 
         else{
@@ -398,7 +398,7 @@ class ArvoreRN{
     }
 
     void imprimir(int& v){
-        imprimir_rec(raiz_versao[v]);
+        imprimir_rec(raiz_versao[v], v);
     }
 
     int sucessor(int k, int v){
@@ -458,5 +458,4 @@ int main(){
     T.imprimir(v);
 
     cout << v << "\n";
-    cout << T.ler(T.raiz_versao[1],{DIR},1).p->chave << "\n";
 }
