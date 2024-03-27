@@ -2,9 +2,9 @@
 #include <climits>
 
 #define QTDE_MODS 2
+#define QTDE_VERSOES 101
 
 using namespace std;
-
 
 enum Tag{
     CHAVE, COR, PAI, ESQ, DIR
@@ -35,6 +35,8 @@ class ArvoreRN{
     //Criando um nó sentinela, assim como o Cormen
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
     Noh sentinela;
+
+
 
 
     //Rotação ensinada pelo Cormen
@@ -169,10 +171,10 @@ class ArvoreRN{
         return x;
     }
 
-    void delete_fixup(Noh* x){
+    void delete_fixup(Noh* x, int& v){
         Noh* w;
 
-        while(x != raiz() && x->cor == 'b'){
+        while(x != raiz_versao[v] && x->cor == 'b'){
             if(x == x->pai->esq){
                 w = x->pai->dir;
                 
@@ -199,7 +201,7 @@ class ArvoreRN{
                     x->pai->cor = 'b';
                     w->dir->cor = 'b';
                     rotacionar_esq(x->pai);
-                    x = raiz();
+                    x = raiz_versao[v];
                 }
             }
 
@@ -229,7 +231,7 @@ class ArvoreRN{
                     x->pai->cor = 'b';
                     w->esq->cor = 'b';
                     rotacionar_dir(x->pai);
-                    x = raiz();
+                    x = raiz_versao[v];
                 }
             }
         }
@@ -257,17 +259,15 @@ class ArvoreRN{
 
     public: 
 
+    Noh* raiz_versao[QTDE_VERSOES];
+    
     ArvoreRN(){
         sentinela.esq = sentinela.dir = sentinela.pai = &sentinela;
         sentinela.cor = 'b';
-    }
 
-    
-
-    Noh* raiz(){
-        if(sentinela.pai != nullptr) return sentinela.pai;
-
-        return &sentinela;
+        for(int i = 0; i < QTDE_VERSOES; i++){
+            raiz_versao[i] = &sentinela; 
+        }
     }
 
     Valor ler(Noh* n, Tag campo, int v){
@@ -303,12 +303,13 @@ class ArvoreRN{
         return resposta;
     }
 
-    void inserir(int k){
+    void inserir(int k, int& v){
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}};
 
 
         Noh *y = &sentinela;
-        Noh *x = raiz();
+        Noh *x = raiz_versao[v];
+
 
         while(x != &sentinela){
             y = x;
@@ -324,6 +325,7 @@ class ArvoreRN{
 
         if(y == &sentinela){
             sentinela.pai = n;
+            raiz_versao[v] = n; 
         }
 
         else{
@@ -339,8 +341,8 @@ class ArvoreRN{
     }
 
 
-    void deletar(int k){
-        Noh* z = buscar(k);
+    void deletar(int k, int& v){
+        Noh* z = buscar(k, v);
 
         if (z == &sentinela){
             return;
@@ -387,20 +389,20 @@ class ArvoreRN{
         delete y;
 
         if(y_cor_original == 'b'){
-            delete_fixup(x);
+            delete_fixup(x, v);
         }
     }
 
-    Noh* buscar(int k){
-        return buscar_rec(raiz(), k);
+    Noh* buscar(int k, int& v){
+        return buscar_rec(raiz_versao[v], k);
     }
 
-    void imprimir(){
-        imprimir_rec(raiz());
+    void imprimir(int& v){
+        imprimir_rec(raiz_versao[v]);
     }
 
-    int sucessor(int k){
-        Noh* pos = buscar(k);
+    int sucessor(int k, int v){
+        Noh* pos = buscar(k, v);
 
         if (pos == &sentinela){
             return INT_MAX;
@@ -422,16 +424,17 @@ class ArvoreRN{
     
 
     //Destrutor da árvore
-    void Deletar(Noh* r){
+    void Deletar(Noh* r, int& v){
         if(r != &sentinela){
-            Deletar(r->esq);
-            Deletar(r->dir);
-            deletar(r->chave);
+            Deletar(r->esq, v);
+            Deletar(r->dir, v);
+            deletar(r->chave, v);
         }
     }
     
     ~ArvoreRN(){
-        Deletar(raiz());    
+        for(int i = 0; i < QTDE_VERSOES; i++)
+            Deletar(raiz_versao[i], i);    
     }
 };
 
@@ -439,19 +442,21 @@ class ArvoreRN{
 int main(){
 
     ArvoreRN T;
+    int v = 0;
 
-    T.inserir(1);
-    T.inserir(2);
-    T.inserir(3);
-    T.inserir(4);
+    T.inserir(1, v);
+    T.inserir(2, v);
+    T.inserir(3, v);
+    T.inserir(4, v);
 
-    T.imprimir();
+    T.imprimir(v);
 
-    T.deletar(3);
+    T.deletar(3, v);
 
     cout << "\n\n";
 
-    T.imprimir();
+    T.imprimir(v);
 
-    cout << T.ler(T.raiz(),{DIR},0).p->chave << "\n";
+    cout << v << "\n";
+    cout << T.ler(T.raiz_versao[1],{DIR},1).p->chave << "\n";
 }
