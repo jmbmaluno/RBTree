@@ -1,34 +1,45 @@
 #include <iostream>
 #include <climits>
 
+#define QTDE_MODS 2
+
 using namespace std;
 
 
+enum Tag{
+    CHAVE, COR, PAI, ESQ, DIR
+};
+
 class ArvoreRN{
 
-    template <typename T>
     struct Noh;
 
+    union Valor{
+        int k;
+        char c;
+        Noh* p;
+    };
+
     //Estrutura do Mod
-    template <typename T>
-    struct Mod {int versao; char campo; T valor;};
+    struct Mod {int versao;
+                Tag tag;
+                Valor valor;
+    };
     
     
     //Estrutura do noh
     //Os campos de retorno e formado por apenas um no, ja que em uma arvore, cada no recebe em apontado por no max 1 ponteiro
     //Portanto, o campo de modificações terá apenas 2 espaços
-    template <typename T>
-    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Mod<T> Mods[2];};
+    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Mod Mods[QTDE_MODS];};
 
     //Criando um nó sentinela, assim como o Cormen
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
-    Noh<int> sentinela;
+    Noh sentinela;
 
 
     //Rotação ensinada pelo Cormen
-    template <typename T>
     void rotacionar_esq(Noh* x){
-        Noh<T>* y = x->dir;
+        Noh* y = x->dir;
         x->dir = y->esq;
 
         if(y->esq != &sentinela){
@@ -259,10 +270,41 @@ class ArvoreRN{
         return &sentinela;
     }
 
+    Valor ler(Noh* n, Tag campo, int v){
+        
+        Valor resposta;
+
+        switch(campo){
+            case CHAVE: resposta.k = n->chave; break;
+            case COR:   resposta.c = n->cor;   break;
+            case PAI:   resposta.p = n->pai;   break;
+            case ESQ:   resposta.p = n->esq;   break;
+            case DIR:   resposta.p = n->dir;   break;
+        };
+
+        int j = 0;
+        int v_aux = 0;
+
+        for(int i = 0; i < QTDE_MODS; i++){
+            if(n->Mods[i].tag == campo and n->Mods[i].versao <= v and n->Mods[i].versao > v_aux){
+                v_aux = n->Mods[i].versao;
+                j = i;
+            }
+        }
+
+        if(j != 0){
+            switch(campo){
+                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
+                case COR:   resposta.c = n->Mods[j].valor.c;   break;
+                default:    resposta.p = n->Mods[j].valor.p;   break;
+            }
+        }
+
+        return resposta;
+    }
 
     void inserir(int k){
-        Mod m = {-1,'n',0,&sentinela, 'n'};
-        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {m,m}};
+        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}};
 
 
         Noh *y = &sentinela;
@@ -377,25 +419,6 @@ class ArvoreRN{
 
         return y->chave;
     }
-
-    template <typename T>
-    T ler(Noh* n, char campo, int v){
-        
-        T resposta = n->chave;
-        int j = 0;
-        int v_aux = 0;
-        
-
-        for (int i = 0; i < 2; i++){
-            if(n->Mods[i].campo == campo && n->Mods[i].versao <= v && n->Mods[i].versao > v_aux){
-                j = i;
-                v_aux = n->Mods[i].versao;
-            }
-        }
-
-
-        return resposta;
-    }
     
 
     //Destrutor da árvore
@@ -429,5 +452,6 @@ int main(){
     cout << "\n\n";
 
     T.imprimir();
-    cout << T.ler<int>(T.raiz(), 'k', 0) << "\n";
+
+    cout << T.ler(T.raiz(),{DIR},0).p->chave << "\n";
 }
