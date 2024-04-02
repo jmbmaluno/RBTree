@@ -69,6 +69,65 @@ class ArvoreRN{
         return resposta;
     }
 
+
+    Void get(Noh* n, Tag campo, int& v, Valor valor){
+        
+        int i = 0;
+
+        while(i < QTDE_MODS && n->Mods[i] != -1){
+            i = i + 1;
+        }
+
+        //Caso ainda tenha espaço no mods
+        if(i != QTDE_MODS){
+            n->Mods[i].versao = v;
+            n->Mods[i].valor = valor;
+            n->Mods[i].tag = campo;
+        }
+
+        //Caso não tenha espaço no mods
+        else{
+            //Duplicando o no
+            Noh* novo = new Noh {ler(n, {CHAVE}, v).k, 
+                                 ler(n, {COR}  , v).c, 
+                                 ler(n, {ESQ}  , v).p, 
+                                 ler(n, {DIR}  , v).p,
+                                 ler(n, {PAI}  , v).p,
+                                 n->retorno, 
+                                 {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}
+                                };
+            
+
+            switch(campo){
+                case CHAVE: novo->chave = valor.k; break;
+                case PAi:   novo->pai   = valor.p; break;
+                case ESQ:   novo->esq   = valor.p; break;
+                case DIR:   novo->dir   = valor.p; break;
+                case COR:   novo->cor   = valor.c; break;
+            }
+
+            //Caso de N ser raiz
+            if(ler(n, {PAI}, v).p == &sentinela){
+                v = v + 1;
+                raiz_versao[v] = novo;
+            }
+
+            //Caso N não seja raiz
+            else{
+                
+                //Caso N seja filho esq
+                if(){
+
+                }
+
+                //Caso N seja filho dir
+                else{
+
+                }
+            }
+        }
+    }
+
     //Rotação ensinada pelo Cormen
     void rotacionar_esq(Noh* x){
         Noh* y = x->dir;
