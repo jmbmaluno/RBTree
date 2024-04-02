@@ -82,6 +82,7 @@ class ArvoreRN{
 
         //Caso ainda tenha espaço no mods
         if(i != QTDE_MODS){
+
             n->Mods[i].versao = v;
             n->Mods[i].valor = valor;
             n->Mods[i].tag = campo;
@@ -90,11 +91,11 @@ class ArvoreRN{
         //Caso não tenha espaço no mods
         else{
             //Duplicando o no
-            Noh* novo = new Noh {ler(n, {CHAVE}, v).k, 
-                                 ler(n, {COR}  , v).c, 
-                                 ler(n, {ESQ}  , v).p, 
-                                 ler(n, {DIR}  , v).p,
-                                 ler(n, {PAI}  , v).p,
+            Noh* novo = new Noh {ler(n, {CHAVE}, v-1).k, 
+                                 ler(n, {COR}  , v-1).c, 
+                                 ler(n, {ESQ}  , v-1).p, 
+                                 ler(n, {DIR}  , v-1).p,
+                                 ler(n, {PAI}  , v-1).p,
                                  n->retorno, 
                                  {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}
                                 };
@@ -109,8 +110,11 @@ class ArvoreRN{
             }
 
             //Caso de N ser raiz
-            if(ler(n, {PAI}, v).p == &sentinela){
+            if(ler(n, {PAI}, v-1).p == &sentinela){
                 raiz_versao[v] = novo;
+                for(int i = v; i < QTDE_VERSOES; i++){
+                    raiz_versao[i] = novo;
+                }
             }
 
             //Caso N não seja raiz
@@ -467,7 +471,6 @@ class ArvoreRN{
     }
 
     void imprimir(int v){
-
         imprimir_rec(raiz_versao[v], v);
     }
 
@@ -513,18 +516,12 @@ class ArvoreRN{
     //ler(Noh* n, Tag campo, int v)
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
-        
-        
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
+        
         set(raiz_versao[v], CHAVE, v, {4});
-        //set(raiz_versao[v], CHAVE, v, {5});
 
-        imprimir(v);   
-
-        cout << "\n";
-
-        imprimir(0);
+        set(raiz_versao[v], CHAVE, v, {5});
     }
 };
 
