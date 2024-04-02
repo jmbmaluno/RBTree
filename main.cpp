@@ -114,15 +114,13 @@ class ArvoreRN{
     }
 
 
-    void imprimir_rec(Noh* r, int &v){
-
-
+    void imprimir_rec(Noh* r, int v){
 
         if(ler(r, {ESQ}, v).p  != &sentinela){
             imprimir_rec(ler(r, {ESQ}, v).p, v);
         }
 
-        cout << "Chave: " << ler(r, {CHAVE}, v).k << " Cor: " << ler(r, {COR}, v).k << "\n";
+        cout << "Chave: " << ler(r, {CHAVE}, v).k << " Cor: " << ler(r, {COR}, v).c << "\n";
 
         if(ler(r, {DIR}, v).p != &sentinela){
             imprimir_rec(ler(r, {DIR}, v).p, v);
@@ -307,7 +305,7 @@ class ArvoreRN{
 
 
         Noh *y = &sentinela;
-        Noh *x = raiz_versao[v];
+        Noh *x = raiz_versao[0];
 
 
         while(x != &sentinela){
@@ -324,8 +322,7 @@ class ArvoreRN{
 
         if(y == &sentinela){
             sentinela.pai = n;
-            raiz_versao[v] = n; 
-            cout << v << "\n";
+            raiz_versao[0] = n; 
         }
 
         else{
@@ -397,7 +394,7 @@ class ArvoreRN{
         return buscar_rec(raiz_versao[v], k);
     }
 
-    void imprimir(int& v){
+    void imprimir(int v){
         imprimir_rec(raiz_versao[v], v);
     }
 
@@ -436,6 +433,12 @@ class ArvoreRN{
         for(int i = 0; i < QTDE_VERSOES; i++)
             Deletar(raiz_versao[i], i);    
     }
+
+    void teste(){    //ler(Noh* n, Tag campo, int v)
+        cout << ler(raiz_versao[0]->dir, CHAVE, 0).k << "\n"; 
+
+        imprimir(0);
+    }
 };
 
 
@@ -449,13 +452,7 @@ int main(){
     T.inserir(3, v);
     T.inserir(4, v);
 
-    T.imprimir(v);
+    T.imprimir(0);
 
-    T.deletar(3, v);
 
-    cout << "\n\n";
-
-    T.imprimir(v);
-
-    cout << v << "\n";
 }
