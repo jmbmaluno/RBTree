@@ -78,6 +78,8 @@ class ArvoreRN{
             i = i + 1;
         }
 
+        v = v + 1;
+
         //Caso ainda tenha espaço no mods
         if(i != QTDE_MODS){
             n->Mods[i].versao = v;
@@ -108,7 +110,6 @@ class ArvoreRN{
 
             //Caso de N ser raiz
             if(ler(n, {PAI}, v).p == &sentinela){
-                v = v + 1;
                 raiz_versao[v] = novo;
             }
 
@@ -512,18 +513,17 @@ class ArvoreRN{
     //ler(Noh* n, Tag campo, int v)
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
-
-
-        imprimir(v);
         
-        cout << "\n";
-
+        
         set(raiz_versao[v], CHAVE, v, {2});
+        set(raiz_versao[v], CHAVE, v, {3});
+        set(raiz_versao[v], CHAVE, v, {4});
+        //set(raiz_versao[v], CHAVE, v, {5});
 
         imprimir(v);   
 
         cout << "\n";
-        
+
         imprimir(0);
     }
 };
