@@ -70,7 +70,7 @@ class ArvoreRN{
     }
 
 
-    Void get(Noh* n, Tag campo, int& v, Valor valor){
+    Void set(Noh* n, Tag campo, int& v, Valor valor){
         
         int i = 0;
 
@@ -115,14 +115,16 @@ class ArvoreRN{
             //Caso N não seja raiz
             else{
                 
-                //Caso N seja filho esq
-                if(){
+                noh* pai = ler(n, {PAI}, v).p;
 
+                //Caso N seja filho esq
+                if(ler(pai, {CHAVE}, v) > novo->chave){
+                    set(pai, ESQ, v, {novo});
                 }
 
                 //Caso N seja filho dir
                 else{
-
+                    set(pai, DIR, v, {novo});
                 }
             }
         }
