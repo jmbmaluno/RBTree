@@ -139,12 +139,40 @@ class ArvoreRN{
     }
 
     //Rotação ensinada pelo Cormen
+    /*
     void rotacionar_esq(Noh* x){
         Noh* y = x->dir;
         x->dir = y->esq;
 
         if(y->esq != &sentinela){
             y->esq->pai = x;
+        }
+
+        else{
+            if(x == x->pai->esq){
+                x->pai->esq = y;
+            }
+            else{
+                x->pai->dir = y;
+            }
+        }
+
+        y->esq = x;
+        x->pai = y;
+    }*/
+
+    void rotacionar_esq(Noh* x, int& v){
+        Valor val;
+        
+        Noh* y = ler(x, DIR, v).p;
+                
+        val.p = ler(y, ESQ, v).p;
+
+        set(ler(x,DIR,v).p, ESQ, v, val);
+
+
+        if(ler(y, ESQ, v).p != &sentinela){
+            set(ler(y, ESQ, v).p, PAI, v, x);
         }
 
         else{
@@ -516,12 +544,15 @@ class ArvoreRN{
     //ler(Noh* n, Tag campo, int v)
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
+
+        /*
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
         
         set(raiz_versao[v], CHAVE, v, {4});
 
         set(raiz_versao[v], CHAVE, v, {5});
+        */
     }
 };
 
@@ -529,6 +560,7 @@ class ArvoreRN{
 int main(){
 
     ArvoreRN T;
+    /*
     int v = 0;
 
     T.inserir(1, v);
@@ -536,6 +568,7 @@ int main(){
     T.inserir(3, v);
     T.inserir(4, v);
     T.teste(v);
+    */
 }
 
 /*
@@ -548,3 +581,5 @@ int main(){
 
     Depois formatar conforme a saida que o trabalho pede
 */
+
+//FALTA TERMINAR O INSERIR
