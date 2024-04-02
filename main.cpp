@@ -537,3 +537,14 @@ int main(){
     T.inserir(4, v);
     T.teste(v);
 }
+
+/*
+    Caso o set seja de CHAVE, eu preciso balancear o noh, para continuar atendendo
+    a propriedade de rubro negra (provavelmente vou ter que fazer o inserir noh).
+
+    Então eu tenho que ajustar o inserir noh para depois balancear o set.
+
+    Depois falta ajustar o Deletar noh.
+
+    Depois formatar conforme a saida que o trabalho pede
+*/
