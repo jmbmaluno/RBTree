@@ -48,7 +48,7 @@ class ArvoreRN{
             case DIR:   resposta.p = n->dir;   break;
         };
 
-        int j = 0;
+        int j = -1;
         int v_aux = 0;
 
         for(int i = 0; i < QTDE_MODS; i++){
@@ -58,7 +58,7 @@ class ArvoreRN{
             }
         }
 
-        if(j != 0){
+        if(j != -1){
             switch(campo){
                 case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
                 case COR:   resposta.c = n->Mods[j].valor.c;   break;
@@ -70,11 +70,11 @@ class ArvoreRN{
     }
 
 
-    Void set(Noh* n, Tag campo, int& v, Valor valor){
+    void set(Noh* n, Tag campo, int& v, Valor valor){
         
         int i = 0;
 
-        while(i < QTDE_MODS && n->Mods[i] != -1){
+        while(i < QTDE_MODS && n->Mods[i].versao != -1){
             i = i + 1;
         }
 
@@ -100,7 +100,7 @@ class ArvoreRN{
 
             switch(campo){
                 case CHAVE: novo->chave = valor.k; break;
-                case PAi:   novo->pai   = valor.p; break;
+                case PAI:   novo->pai   = valor.p; break;
                 case ESQ:   novo->esq   = valor.p; break;
                 case DIR:   novo->dir   = valor.p; break;
                 case COR:   novo->cor   = valor.c; break;
@@ -115,16 +115,19 @@ class ArvoreRN{
             //Caso N não seja raiz
             else{
                 
-                noh* pai = ler(n, {PAI}, v).p;
+                Noh* pai = ler(n, {PAI}, v).p;
+
+                Valor val;
+                val.p = {novo};
 
                 //Caso N seja filho esq
-                if(ler(pai, {CHAVE}, v) > novo->chave){
-                    set(pai, ESQ, v, {novo});
+                if(ler(pai, {CHAVE}, v).k > novo->chave){
+                    set(pai, ESQ, v, val);
                 }
 
                 //Caso N seja filho dir
                 else{
-                    set(pai, DIR, v, {novo});
+                    set(pai, DIR, v, val);
                 }
             }
         }
@@ -366,8 +369,14 @@ class ArvoreRN{
 
 
         Noh *y = &sentinela;
-        Noh *x = raiz_versao[0];
+        Noh *x = raiz_versao[v];
 
+
+        if(v == 0){
+            for(int i = 0; i < QTDE_VERSOES; i++){
+                raiz_versao[i] = n;
+            }
+        }
 
         while(x != &sentinela){
             y = x;
@@ -383,7 +392,7 @@ class ArvoreRN{
 
         if(y == &sentinela){
             sentinela.pai = n;
-            raiz_versao[0] = n; 
+            raiz_versao[v] = n; 
         }
 
         else{
@@ -394,7 +403,8 @@ class ArvoreRN{
                 y->dir = n;
             }
         }
-
+        
+        v = v+1;
         inserir_fixup(n);
     }
 
@@ -456,6 +466,7 @@ class ArvoreRN{
     }
 
     void imprimir(int v){
+
         imprimir_rec(raiz_versao[v], v);
     }
 
@@ -490,14 +501,29 @@ class ArvoreRN{
         }
     }
     
+    /*
     ~ArvoreRN(){
         for(int i = 0; i < QTDE_VERSOES; i++)
             Deletar(raiz_versao[i], i);    
-    }
+    }*/
 
-    void teste(){    //ler(Noh* n, Tag campo, int v)
-        cout << ler(raiz_versao[0]->dir, CHAVE, 0).k << "\n"; 
 
+
+    //ler(Noh* n, Tag campo, int v)
+    //set (Noh* n, Tag campo, int& v, Valor valor)
+    void teste(int& v){    
+
+
+        imprimir(v);
+        
+        cout << "\n";
+
+        set(raiz_versao[v], CHAVE, v, {2});
+
+        imprimir(v);   
+
+        cout << "\n";
+        
         imprimir(0);
     }
 };
@@ -512,8 +538,5 @@ int main(){
     T.inserir(2, v);
     T.inserir(3, v);
     T.inserir(4, v);
-
-    T.imprimir(0);
-
-
+    T.teste(v);
 }
