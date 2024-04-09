@@ -69,7 +69,11 @@ class ArvoreRN{
         return resposta;
     }
 
-
+    
+    //Falta mexer nos campos de retorno de quem aponta para o noh duplicado
+    //Falta fazer o controle de versões
+    //Eu quero que a versão mude apenas quando eu for inserir ou retirar um noh
+    //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
     void set(Noh* n, Tag campo, int& v, Valor valor){
         
         int i = 0;
@@ -77,8 +81,6 @@ class ArvoreRN{
         while(i < QTDE_MODS && n->Mods[i].versao != -1){
             i = i + 1;
         }
-
-        v = v + 1;
 
         //Caso ainda tenha espaço no mods
         if(i != QTDE_MODS){
@@ -109,6 +111,9 @@ class ArvoreRN{
                 case COR:   novo->cor   = valor.c; break;
             }
 
+            Valor val;
+            val.p = {novo};
+            
             //Caso de N ser raiz
             if(ler(n, {PAI}, v-1).p == &sentinela){
                 raiz_versao[v] = novo;
@@ -122,9 +127,6 @@ class ArvoreRN{
                 
                 Noh* pai = ler(n, {PAI}, v).p;
 
-                Valor val;
-                val.p = {novo};
-
                 //Caso N seja filho esq
                 if(ler(pai, {CHAVE}, v).k > novo->chave){
                     set(pai, ESQ, v, val);
@@ -135,11 +137,24 @@ class ArvoreRN{
                     set(pai, DIR, v, val);
                 }
             }
+
+            Noh* esq = ler(n, {ESQ}, v).p;
+            Noh* dir = ler(n, {DIR}, v).p;
+
+            //Avisando para os filhos trocarem de pai
+
+            if(esq != &sentinela){
+                set(esq, PAI, v, val);
+            }
+
+            if(dir != &sentinela){
+                set(dir, PAI, v, val);
+            }
         }
     }
 
     //Rotação ensinada pelo Cormen
-    /*
+    
     void rotacionar_esq(Noh* x){
         Noh* y = x->dir;
         x->dir = y->esq;
@@ -159,8 +174,9 @@ class ArvoreRN{
 
         y->esq = x;
         x->pai = y;
-    }*/
-
+    }
+    
+    /*
     void rotacionar_esq(Noh* x, int& v){
         Valor val;
         
@@ -186,7 +202,7 @@ class ArvoreRN{
 
         y->esq = x;
         x->pai = y;
-    }
+    }*/
 
     //Rotação a direita
     void rotacionar_dir(Noh* x){
@@ -545,14 +561,18 @@ class ArvoreRN{
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
 
-        /*
+        
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
         
         set(raiz_versao[v], CHAVE, v, {4});
 
         set(raiz_versao[v], CHAVE, v, {5});
-        */
+
+        imprimir(v);
+
+        cout << v << "\n";
+        
     }
 };
 
@@ -560,15 +580,16 @@ class ArvoreRN{
 int main(){
 
     ArvoreRN T;
-    /*
+    
     int v = 0;
-
+    
     T.inserir(1, v);
     T.inserir(2, v);
     T.inserir(3, v);
     T.inserir(4, v);
     T.teste(v);
-    */
+    
+
 }
 
 /*
