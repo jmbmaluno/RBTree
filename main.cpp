@@ -83,8 +83,7 @@ class ArvoreRN{
         }
 
         //Caso ainda tenha espaço no mods
-        if(i != QTDE_MODS){
-
+        if(i < QTDE_MODS){
             n->Mods[i].versao = v;
             n->Mods[i].valor = valor;
             n->Mods[i].tag = campo;
@@ -92,6 +91,8 @@ class ArvoreRN{
 
         //Caso não tenha espaço no mods
         else{
+
+            cout << "passei daqui\n";
             //Duplicando o no
             Noh* novo = new Noh {ler(n, {CHAVE}, v-1).k, 
                                  ler(n, {COR}  , v-1).c, 
@@ -101,7 +102,6 @@ class ArvoreRN{
                                  n->retorno, 
                                  {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}
                                 };
-            
 
             switch(campo){
                 case CHAVE: novo->chave = valor.k; break;
@@ -153,14 +153,21 @@ class ArvoreRN{
         }
     }
 
+    //MUDAR O ALGORITMO DA ROTAÇÂO PRA FICAR IGUAL AO DO CORMEN
     //Rotação ensinada pelo Cormen
-    
+    /*
     void rotacionar_esq(Noh* x){
         Noh* y = x->dir;
         x->dir = y->esq;
 
         if(y->esq != &sentinela){
             y->esq->pai = x;
+        }
+
+        y->pai = x->pai;
+
+        if(x->pai == &sentinela){
+            raiz_versao[v] = y;
         }
 
         else{
@@ -174,21 +181,67 @@ class ArvoreRN{
 
         y->esq = x;
         x->pai = y;
-    }
+    }*/
     
-    /*
+    
     void rotacionar_esq(Noh* x, int& v){
         Valor val;
         
+        //y = x->dir
         Noh* y = ler(x, DIR, v).p;
-                
-        val.p = ler(y, ESQ, v).p;
 
-        set(ler(x,DIR,v).p, ESQ, v, val);
-
+        //x->dir = y->esq;
+        val = ler(y, ESQ, v);
+        set(x, DIR, v, val);
 
         if(ler(y, ESQ, v).p != &sentinela){
-            set(ler(y, ESQ, v).p, PAI, v, x);
+            //y->esq->pai= x;
+            val.p = x;
+            set(ler(y, ESQ, v).p, PAI, v, val);
+        }
+        
+        //y->pai = x->pai;
+        val = ler(x, PAI, v);
+        set(y, PAI, v, val);
+
+        if(ler(x,PAI,v).p == &sentinela){
+            raiz_versao[v] = y;
+        }
+
+        else{
+            val.p = {y};
+            if(x == ler(ler(x, PAI, v).p, ESQ, v).p){
+                //x->pai->esq = y;
+                set(ler(x, PAI, v).p, ESQ, v, val);
+            }
+            else{
+                //x->pai->dir = y;
+                set(ler(x, PAI, v).p, DIR, v, val);
+            }
+        }
+
+        val.p = {x};
+        set(y, ESQ, v, val);
+
+        val.p = {y};
+        set(y, PAI, v, val);
+
+    }
+
+    //Rotação a direita
+    /*
+    void rotacionar_dir(Noh* x){
+        Noh* y = x->esq;
+        x->esq = y->dir;
+
+        if(y->dir != &sentinela){
+            y->dir->pai = x;
+        }
+
+        y->pai = x->pai;
+
+        if(x->pai == &sentinela){
+            raiz_versao[v] = y;
         }
 
         else{
@@ -204,28 +257,48 @@ class ArvoreRN{
         x->pai = y;
     }*/
 
-    //Rotação a direita
-    void rotacionar_dir(Noh* x){
-        Noh* y = x->esq;
-        x->esq = y->dir;
+    void rotacionar_dir(Noh* x, int&v){
+        Valor val;
+        
+        //y = x->dir
+        Noh* y = ler(x, ESQ, v).p;
 
-        if(y->dir != &sentinela){
-            y->dir->pai = x;
+        //x->dir = y->esq;
+        val = ler(y, DIR, v);
+        set(x, ESQ, v, val);
+
+        if(ler(y, DIR, v).p != &sentinela){
+            //y->esq->pai= x;
+            val.p = x;
+            set(ler(y, DIR, v).p, PAI, v, val);
+        }
+        
+        //y->pai = x->pai;
+        val = ler(x, PAI, v);
+        set(y, PAI, v, val);
+
+        if(ler(x,PAI,v).p == &sentinela){
+            raiz_versao[v] = y;
         }
 
         else{
-            if(x == x->pai->dir){
-                x->pai->dir = y;
+            val.p = {y};
+            if(x == ler(ler(x, PAI, v).p, DIR, v).p){
+                //x->pai->esq = y;
+                set(ler(x, PAI, v).p, DIR, v, val);
             }
             else{
-                x->pai->dir = y;
+                //x->pai->dir = y;
+                set(ler(x, PAI, v).p, ESQ, v, val);
             }
         }
 
-        y->dir = x;
-        x->pai = y;
-    }
+        val.p = {x};
+        set(y, DIR, v, val);
 
+        val.p = {y};
+        set(y, PAI, v, val);
+    }
 
     void imprimir_rec(Noh* r, int v){
 
@@ -241,52 +314,85 @@ class ArvoreRN{
     }
 
 
-    void inserir_fixup(Noh* n){
-        while (n->pai->cor == 'r'){
-            if (n->pai == n->pai->pai->esq){
-                Noh* y = n->pai->pai->dir;
+    void inserir_fixup(Noh* n, int& v){
 
-                if(y->cor = 'r'){
-                    n->pai->cor = 'b';
-                    y->cor = 'b';
-                    n->pai->pai->cor = 'r';
-                    n = n->pai->pai;
+        Noh* pai = ler(n,PAI,v).p;
+        Valor val;
+
+        while (ler(pai, COR, v).c == 'r'){
+
+            if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
+                
+                Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
+
+                if(ler(y, COR, v).c == 'r'){
+                    val.c = {'b'};
+                    set(pai, COR, v, val);
+
+                    set(y, COR, v, val);
+                    
+                    val.c = {'r'};
+                    set(ler(pai, PAI, v).p, COR, v, val);
+                    
+                    n = ler(pai, PAI, v).p;
                 }
 
+                
                 else{
-                    if(n == n->pai->dir){
-                        n = n->pai;
-                        rotacionar_esq(n);
+                    if(n == ler(pai, DIR, v).p){
+                        n = pai;
+                        rotacionar_esq(n, v);
                     }
 
-                    n->pai->cor = 'b';
-                    n->pai->pai->cor = 'r';
-                    rotacionar_dir(n->pai->pai);
+                    val.c = {'b'};
+
+                    set(pai, COR, v, val);
+                    
+                    val.c = {'r'};
+                    set(ler(pai, PAI, v).p, COR, v, val);
+
+                    rotacionar_dir(ler(pai, PAI, v).p, v);
                 }
             }
 
+            //continuar com set e get
             else{
-                Noh* y = n->pai->pai->esq;
+                Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
 
-                if(y->cor = 'r'){
-                    n->pai->cor = 'b';
-                    y->cor = 'b';
-                    n->pai->pai->cor = 'r';
-                    n = n->pai->pai;
+                if(ler(y, COR, v).c == 'r'){
+                    val.c = {'b'};
+                    set(pai, COR, v, val);
+
+                    set(y, COR, v, val);
+                    
+                    val.c = {'r'};
+                    set(ler(pai, PAI, v).p, COR, v, val);
+                    
+                    n = ler(pai, PAI, v).p;
                 }
 
+                
                 else{
-                    if(n == n->pai->esq){
-                        n = n->pai;
-                        rotacionar_dir(n);
+                    if(n == ler(pai, ESQ, v).p){
+                        n = pai;
+                        rotacionar_dir(n, v);
                     }
 
-                    n->pai->cor = 'b';
-                    n->pai->pai->cor = 'r';
-                    rotacionar_esq(n->pai->pai);
-                }             
+                    val.c = {'b'};
+
+                    set(pai, COR, v, val);
+                    
+                    val.c = {'r'};
+                    set(ler(pai, PAI, v).p, COR, v, val);
+
+                    rotacionar_esq(ler(pai, PAI, v).p, v);
+                }      
             }
         }
+
+        val.c = {'b'};
+        set(raiz_versao[v], COR, v, val);
+        v = v+1;
     }
 
 
@@ -324,7 +430,7 @@ class ArvoreRN{
                 if(w->cor == 'r'){
                     w->cor = 'b';
                     x->pai->cor = 'r';
-                    rotacionar_esq(x->pai);
+                    rotacionar_esq(x->pai, v);
                     w = x->pai->dir;
                 }
 
@@ -336,14 +442,14 @@ class ArvoreRN{
                     if(w->dir->cor == 'b'){
                         w->esq->cor = 'b';
                         w->cor = 'r';
-                        rotacionar_dir(w);
+                        rotacionar_dir(w, v);
                         w = x->pai->dir;
                     }
 
                     w->cor = x->pai->cor;
                     x->pai->cor = 'b';
                     w->dir->cor = 'b';
-                    rotacionar_esq(x->pai);
+                    rotacionar_esq(x->pai, v);
                     x = raiz_versao[v];
                 }
             }
@@ -354,7 +460,7 @@ class ArvoreRN{
                 if(w->cor == 'r'){
                     w->cor = 'b';
                     x->pai->cor = 'r';
-                    rotacionar_dir(x->pai);
+                    rotacionar_dir(x->pai, v);
                     w = x->pai->esq;
                 }
 
@@ -366,14 +472,14 @@ class ArvoreRN{
                     if(w->esq->cor == 'b'){
                         w->dir->cor = 'b';
                         w->cor = 'r';
-                        rotacionar_esq(w);
+                        rotacionar_esq(w, v);
                         w = x->pai->esq;
                     }
 
                     w->cor = x->pai->cor;
                     x->pai->cor = 'b';
                     w->esq->cor = 'b';
-                    rotacionar_dir(x->pai);
+                    rotacionar_dir(x->pai, v);
                     x = raiz_versao[v];
                 }
             }
@@ -413,13 +519,14 @@ class ArvoreRN{
         }
     }
 
+    //Acho que terminei
+    //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}};
 
 
         Noh *y = &sentinela;
         Noh *x = raiz_versao[v];
-
 
         if(v == 0){
             for(int i = 0; i < QTDE_VERSOES; i++){
@@ -429,15 +536,21 @@ class ArvoreRN{
 
         while(x != &sentinela){
             y = x;
-            if(n->chave < x->chave){ 
-                x = x->esq;
+
+            if(ler(n, CHAVE, v).k < ler(x, CHAVE, v).k){ 
+                x = ler(x, ESQ, v).p;
             }
             else{
-                x = x->dir;
+                x = ler(x, DIR, v).p;
             }
         }
+        
+        Valor val;
+        val.p = {y};
 
-        n->pai = y;
+        set(n, PAI, v, val);
+
+        //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
 
         if(y == &sentinela){
             sentinela.pai = n;
@@ -445,16 +558,16 @@ class ArvoreRN{
         }
 
         else{
-            if(n->chave < y->chave){
-                y->esq = n;
+            val.p = {n};
+            if(ler(n, CHAVE, v).k < ler(y, CHAVE, v).k){    
+                set(y, ESQ, v, val);
             }
             else{
-                y->dir = n;
+                set(y, DIR, v, val);
             }
         }
         
-        v = v+1;
-        inserir_fixup(n);
+        inserir_fixup(n, v);
     }
 
 
@@ -561,13 +674,12 @@ class ArvoreRN{
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
 
+        //set(raiz_versao[v], CHAVE, v, {5});
+        //set(raiz_versao[v], CHAVE, v, {3});
         
-        set(raiz_versao[v], CHAVE, v, {2});
-        set(raiz_versao[v], CHAVE, v, {3});
-        
-        set(raiz_versao[v], CHAVE, v, {4});
+        //set(raiz_versao[v], CHAVE, v, {4});
 
-        set(raiz_versao[v], CHAVE, v, {5});
+        //set(raiz_versao[v], CHAVE, v, {5});
 
         imprimir(v);
 
@@ -585,8 +697,8 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    T.inserir(3, v);
-    T.inserir(4, v);
+    //T.inserir(3, v);
+    //T.inserir(4, v);
     T.teste(v);
     
 
