@@ -74,7 +74,7 @@ class ArvoreRN{
     //Falta fazer o controle de versões
     //Eu quero que a versão mude apenas quando eu for inserir ou retirar um noh
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
-    void set(Noh* n, Tag campo, int& v, Valor valor){
+    void set(Noh* &n, Tag campo, int& v, Valor valor){
         
         int i = 0;
 
@@ -320,7 +320,7 @@ class ArvoreRN{
         }
     }
 
-    /*
+    
     void inserir_fixup(Noh* n, int& v){
 
         Noh* pai = ler(n,PAI,v).p;
@@ -409,8 +409,9 @@ class ArvoreRN{
         val.c = {'b'};
         set(raiz_versao[v], COR, v, val);
         
-    }*/
+    }
 
+    /*
     void inserir_fixup(Noh *z, int& v){
         Valor val;
 
@@ -424,7 +425,7 @@ class ArvoreRN{
             val.c = 'b';
             set(ler(z, PAI, v).p, COR, v, val);
         }
-    }
+    }*/
 
 
     void transplantar(Noh* u, Noh* v){
