@@ -1,7 +1,7 @@
 #include <iostream>
 #include <climits>
 
-#define QTDE_MODS 2
+#define QTDE_MODS 6
 #define QTDE_VERSOES 101
 
 using namespace std;
@@ -99,7 +99,13 @@ class ArvoreRN{
                                  ler(n, {DIR}  , v-1).p,
                                  ler(n, {PAI}  , v-1).p,
                                  n->retorno, 
-                                 {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}
+                                 {
+                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
+                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
+                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}
+                                 
+                                 }
+
                                 };
 
             switch(campo){
@@ -314,90 +320,110 @@ class ArvoreRN{
         }
     }
 
-
+    /*
     void inserir_fixup(Noh* n, int& v){
 
         Noh* pai = ler(n,PAI,v).p;
         Valor val;
 
-        while (ler(pai, COR, v).c == 'r'){
+        while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
 
             cout << "dentro do loop\n";
 
-            if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
-                
-                Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
+            if (ler(n,PAI,v).p == ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p){
+                cout << "primeiro if\n";
+                Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, DIR, v).p;
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
-                    set(pai, COR, v, val);
+                    set(ler(n,PAI,v).p, COR, v, val);
 
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
                     
-                    n = ler(pai, PAI, v).p;
+                    n = ler(ler(n,PAI,v).p, PAI, v).p;
                 }
 
                 
                 else{
-                    if(n == ler(pai, DIR, v).p){
-                        n = pai;
+                    if(n == ler(ler(n,PAI,v).p, DIR, v).p){
+                        n = ler(n,PAI,v).p;
                         rotacionar_esq(n, v);
                     }
 
                     val.c = {'b'};
 
-                    set(pai, COR, v, val);
+                    set(ler(n,PAI,v).p, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
 
-                    rotacionar_dir(ler(pai, PAI, v).p, v);
+                    rotacionar_dir(ler(ler(n,PAI,v).p, PAI, v).p, v);
                 }
             }
 
             //continuar com set e get
             else{
-                Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
+                cout << "segundo caso\n";
+                Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p;
+                cout << ler(y, CHAVE, v).p << "\n";
 
                 if(ler(y, COR, v).c == 'r'){
+                    cout << "primeiro if\n";
                     val.c = {'b'};
-                    set(pai, COR, v, val);
+                    set(ler(n,PAI,v).p, COR, v, val);
 
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
                     
-                    n = ler(pai, PAI, v).p;
+                    n = ler(ler(n,PAI,v).p, PAI, v).p;
                 }
 
                 
                 else{
-                    if(n == ler(pai, ESQ, v).p){
-                        n = pai;
+                    cout << "segundo if\n";
+
+                    if(n == ler(ler(n,PAI,v).p, ESQ, v).p){
+                        n = ler(n,PAI,v).p;
                         rotacionar_dir(n, v);
                     }
 
                     val.c = {'b'};
 
-                    set(pai, COR, v, val);
+                    set(ler(n,PAI,v).p, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
 
-                    rotacionar_esq(ler(pai, PAI, v).p, v);
+                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
+
+                    rotacionar_esq(ler(ler(n,PAI,v).p, PAI, v).p, v);
                 }      
             }
 
-            pai = ler(n,PAI,v).p;
         }
 
         val.c = {'b'};
         set(raiz_versao[v], COR, v, val);
         
+    }*/
+
+    void inserir_fixup(Noh *z, int& v){
+        Valor val;
+
+        while(ler(ler(z, PAI, v).p, COR, v).c == 'r'){
+            if( ler(z, PAI, v).p == ler( ler( ler(z, PAI, v).p, PAI, v).p, ESQ, v).p){
+                cout << "o pai é filho esq\n";
+            }
+            else{
+                cout << "o pai é filho dir\n";
+            }
+            val.c = 'b';
+            set(ler(z, PAI, v).p, COR, v, val);
+        }
     }
 
 
@@ -527,7 +553,13 @@ class ArvoreRN{
     //Acho que terminei
     //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
-        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, &sentinela, &sentinela, {{-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}}};
+        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
+                           &sentinela, &sentinela, 
+                           {
+                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
+                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
+                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}
+                           }};
 
 
         Noh *y = &sentinela;
@@ -704,7 +736,7 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    T.inserir(3, v);
+    //T.inserir(3, v);
     //T.inserir(4, v);
     T.teste(v);
     
