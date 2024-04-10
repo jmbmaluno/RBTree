@@ -92,7 +92,6 @@ class ArvoreRN{
         //Caso não tenha espaço no mods
         else{
 
-            cout << "passei daqui\n";
             //Duplicando o no
             Noh* novo = new Noh {ler(n, {CHAVE}, v-1).k, 
                                  ler(n, {COR}  , v-1).c, 
@@ -150,6 +149,8 @@ class ArvoreRN{
             if(dir != &sentinela){
                 set(dir, PAI, v, val);
             }
+
+            n = novo;
         }
     }
 
@@ -321,6 +322,8 @@ class ArvoreRN{
 
         while (ler(pai, COR, v).c == 'r'){
 
+            cout << "dentro do loop\n";
+
             if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
                 
                 Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
@@ -388,11 +391,13 @@ class ArvoreRN{
                     rotacionar_esq(ler(pai, PAI, v).p, v);
                 }      
             }
+
+            pai = ler(n,PAI,v).p;
         }
 
         val.c = {'b'};
         set(raiz_versao[v], COR, v, val);
-        v = v+1;
+        
     }
 
 
@@ -527,6 +532,8 @@ class ArvoreRN{
 
         Noh *y = &sentinela;
         Noh *x = raiz_versao[v];
+
+        v = v+1;
 
         if(v == 0){
             for(int i = 0; i < QTDE_VERSOES; i++){
@@ -697,7 +704,7 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    //T.inserir(3, v);
+    T.inserir(3, v);
     //T.inserir(4, v);
     T.teste(v);
     
@@ -716,3 +723,10 @@ int main(){
 */
 
 //FALTA TERMINAR O INSERIR
+
+
+/*
+    Eu acho que to com problema no set.
+    quando eu duplico eu tenho que ter algum jeito de retornar o pontiero para o novo no
+    mas eu n to conseguinto atualizar
+*/
