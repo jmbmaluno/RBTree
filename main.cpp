@@ -122,7 +122,10 @@ class ArvoreRN{
         
         int i = 0;
 
-        while(i < QTDE_MODS && n->Mods[i].versao != -1){
+        while (i < QTDE_MODS && 
+              (n->Mods[i].versao != v || n->Mods[i].tag != campo) &&
+               n->Mods[i].versao != -1){
+
             i = i + 1;
         }
 
@@ -450,7 +453,7 @@ class ArvoreRN{
         val.c = {'b'};
 
         if(v == 3){
-            if(raiz_versao[2] == &sentinela){
+            if(raiz_versao[3] == &sentinela){
                 cout << "eh sentinela\n";
             }
             else{
@@ -796,11 +799,20 @@ int main(){
     
     int v = 0;
     
+    /*
     T.inserir(1, v);
     T.inserir(2, v);
     T.inserir(3, v);
+    */
+
+    
+    T.inserir(1, v);
+    T.inserir(2, v);
+    T.inserir(-1, v);
+    T.inserir(3, v);
     //T.inserir(3,v);
-    //T.inserir(4, v);
+    T.inserir(4, v);
+    
     T.teste(v);
     
 
