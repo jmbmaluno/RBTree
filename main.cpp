@@ -645,6 +645,10 @@ class ArvoreRN{
 
         v = v+1;
 
+        if(v == QTDE_VERSOES){
+            cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
+        }
+
         if(v == 1){
             for(int i = 0; i < QTDE_VERSOES; i++){
                 raiz_versao[i] = n;
@@ -745,14 +749,20 @@ class ArvoreRN{
 
     void deletar(int k, int& v){
         Noh* z = buscar(k, v);
+
         Valor val;
         
         v = v+1;
-        
+
+        if(v == QTDE_VERSOES){
+            cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
+        }
+
         if( z == &sentinela){
             return;
         }
 
+        Noh* z_aux = z;
         Noh* y = z;
         Noh* x;
 
@@ -760,6 +770,7 @@ class ArvoreRN{
 
         if(ler(z, ESQ, v).p == &sentinela){
             x = ler(z, DIR, v).p;
+            transplantar(z, ler(z, DIR, v).p, v);
         }
 
         else{
@@ -801,10 +812,27 @@ class ArvoreRN{
             }
         }
 
-        /*
+        
         if(y_cor_original == 'b'){
-            delete_fixup(x, v);
-        }*/
+            cout << "cai nesse caso\n";
+            //delete_fixup(x, v);
+        }
+
+
+        val.p = {&sentinela};
+
+        set(ler(z_aux, ESQ, v).p, PAI, v, val);
+        set(ler(z_aux, DIR, v).p, PAI, v, val);
+
+        Noh* pai_antigo = ler(z_aux, PAI, v).p;
+
+        if(ler(pai_antigo, ESQ, v).p == z_aux){
+            set(pai_antigo, ESQ, v, val);
+        }
+        else{
+            set(pai_antigo, DIR, v, val);
+        }
+
     }
 
     Noh* buscar(int k, int& v){
@@ -869,6 +897,8 @@ class ArvoreRN{
         }
 
         else{
+            imprimir(2);
+            cout << "\n";
             imprimir(v);
         }
 
@@ -893,7 +923,7 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    T.deletar(1, v);
+    T.deletar(2, v);
     //T.inserir(-1, v);
     //T.inserir(3, v);
     //T.inserir(4, v);
