@@ -75,11 +75,10 @@ class ArvoreRN{
 
     Valor ler(Noh* n, Tag campo, int v){
         
-        if(n != &sentinela){
-            //Coloando na ultima versão do no;
-            while (n->prox_versao != &sentinela){
-                n = n->prox_versao;
-            }
+
+        //Coloando na ultima versão do no;
+        while (n->prox_versao != &sentinela){
+            n = n->prox_versao;
         }
 
 
@@ -412,7 +411,6 @@ class ArvoreRN{
             //continuar com set e get
             else{
                 Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p;
-                cout << ler(y, CHAVE, v).p << "\n";
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
@@ -428,12 +426,12 @@ class ArvoreRN{
 
                 
                 else{
-
                     if(n == ler(ler(n,PAI,v).p, ESQ, v).p){
                         n = ler(n,PAI,v).p;
                         rotacionar_dir(n, v);
                     }
 
+                    
                     val.c = {'b'};
 
                     set(ler(n,PAI,v).p, COR, v, val);
@@ -443,12 +441,24 @@ class ArvoreRN{
                     set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
 
                     rotacionar_esq(ler(ler(n,PAI,v).p, PAI, v).p, v);
+
                 }      
             }
 
         }
 
         val.c = {'b'};
+
+        if(v == 3){
+            if(raiz_versao[2] == &sentinela){
+                cout << "eh sentinela\n";
+            }
+            else{
+                cout << ler(ler(raiz_versao[2], DIR, 2).p, CHAVE, 2).k << "\n"; 
+            }
+        }
+
+        //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
         
     }
@@ -585,7 +595,8 @@ class ArvoreRN{
     Noh* raiz_versao[QTDE_VERSOES];
     
     ArvoreRN(){
-        sentinela.esq = sentinela.dir = sentinela.pai = &sentinela;
+        sentinela.esq = sentinela.dir = 
+        sentinela.pai = sentinela.prox_versao = &sentinela;
         sentinela.cor = 'b';
 
         for(int i = 0; i < QTDE_VERSOES; i++){
@@ -610,7 +621,7 @@ class ArvoreRN{
 
         v = v+1;
 
-        if(v == 0){
+        if(v == 1){
             for(int i = 0; i < QTDE_VERSOES; i++){
                 raiz_versao[i] = n;
             }
@@ -764,10 +775,16 @@ class ArvoreRN{
         //set(raiz_versao[v], CHAVE, v, {4});
 
         //set(raiz_versao[v], CHAVE, v, {5});
+        if(raiz_versao[v] == &sentinela){
+            cout << "eh sentinela\n";
+        }
 
-        imprimir(v);
+        else{
+            cout << raiz_versao[v]->chave << "\n";
+            imprimir(v);
+        }
 
-        cout << v << "\n";
+        //cout << v << "\n";
         
     }
 };
@@ -782,7 +799,8 @@ int main(){
     T.inserir(1, v);
     T.inserir(2, v);
     T.inserir(3, v);
-    T.inserir(4, v);
+    //T.inserir(3,v);
+    //T.inserir(4, v);
     T.teste(v);
     
 
