@@ -483,6 +483,7 @@ class ArvoreRN{
     }*/
 
 
+    /*
     void transplantar(Noh* u, Noh* v){
         if(u->pai == &sentinela){
             sentinela.pai = v;
@@ -497,11 +498,31 @@ class ArvoreRN{
         }
 
         v->pai = u->pai;
+    }*/
+
+    void transplantar(Noh* u, Noh* n, int& v){
+        Valor val;
+
+        if(ler(u, PAI, v).p == &sentinela){
+            sentinela.pai = n;
+        }
+        else{
+            val.p = {n};
+            if(u == ler(ler(u, PAI, v).p, ESQ, v).p){
+                set(ler(u, PAI, v).p, ESQ, v, val);
+            }
+            else{
+                set(ler(u, PAI, v).p, DIR, v, val);
+            }
+        }
+
+        val.p = {ler(u, PAI, v).p};
+        set(n, PAI, v, val);
     }
 
-    Noh* minimo(Noh* x){
-        while(x->esq != &sentinela){
-            x = x->esq;
+    Noh* minimo(Noh* x, int& v){
+        while(ler(x, ESQ, v).p != &sentinela){
+            x = ler(x, ESQ, v).p;
         }
 
         return x;
@@ -575,21 +596,21 @@ class ArvoreRN{
         x->cor = 'b';
     }
 
-    Noh* buscar_rec(Noh* r, int k){
+    Noh* buscar_rec(Noh* r, int k, int &v){
         if(r == &sentinela){
             return &sentinela;
         }
 
-        if(r->chave == k){
+        if(ler_impressao(r, CHAVE, v).k == k){
             return r;
         }
 
-        if(r->chave < k){
-            return buscar_rec(r->dir, k);
+        if(ler_impressao(r, CHAVE, v).k < k){
+            return buscar_rec(ler_impressao(r, DIR, v).p, k, v);
         }
 
         else{
-            return buscar_rec(r->esq, k);
+            return buscar_rec(ler_impressao(r, ESQ, v).p, k, v);
         }
     }
 
@@ -669,6 +690,7 @@ class ArvoreRN{
     }
 
 
+    /*
     void deletar(int k, int& v){
         Noh* z = buscar(k, v);
 
@@ -719,10 +741,74 @@ class ArvoreRN{
         if(y_cor_original == 'b'){
             delete_fixup(x, v);
         }
+    }*/
+
+    void deletar(int k, int& v){
+        Noh* z = buscar(k, v);
+        Valor val;
+        
+        v = v+1;
+        
+        if( z == &sentinela){
+            return;
+        }
+
+        Noh* y = z;
+        Noh* x;
+
+        char y_cor_original = ler(y, COR, v).c;
+
+        if(ler(z, ESQ, v).p == &sentinela){
+            x = ler(z, DIR, v).p;
+        }
+
+        else{
+            if(ler(z, DIR, v).p == &sentinela){
+                x = ler(z, ESQ, v).p;
+                transplantar(z, ler(z, ESQ, v).p, v);
+            }
+
+            else{
+                y = minimo(ler(z, DIR, v).p, v);
+                y_cor_original = ler(y, COR, v).c;
+                x = ler(y, DIR, v).p;
+
+                if(ler(y, PAI, v).p == z){
+                    val.p = {y};
+                    set(x, PAI, v, val);
+                }
+
+                else{
+                    transplantar(y, ler(y, DIR, v).p, v);
+
+                    val.p ={ler(z, DIR, v).p};
+                    set(y, DIR, v, val);
+                    
+                    val.p = {y};
+                    set(ler(y,DIR,v).p, PAI, v, val);
+                }
+
+                transplantar(z, y, v);
+
+                val.p = {ler(z, ESQ, v).p};
+                set(y, ESQ, v, val);
+
+                val.p = {y};
+                set(ler(y, ESQ, v).p, PAI, v, val);
+
+                val.c = {ler(z, COR, v).c};
+                set(y, COR, v, val);
+            }
+        }
+
+        /*
+        if(y_cor_original == 'b'){
+            delete_fixup(x, v);
+        }*/
     }
 
     Noh* buscar(int k, int& v){
-        return buscar_rec(raiz_versao[v], k);
+        return buscar_rec(raiz_versao[v], k, v);
     }
 
     void imprimir(int v){
@@ -737,7 +823,7 @@ class ArvoreRN{
         }
 
         if(pos->dir != &sentinela){
-            return minimo(pos->dir)->chave;
+            return minimo(pos->dir, v)->chave;
         }
 
         Noh* y = pos->pai;
@@ -783,11 +869,10 @@ class ArvoreRN{
         }
 
         else{
-            cout << raiz_versao[v]->chave << "\n";
             imprimir(v);
         }
 
-        //cout << v << "\n";
+        cout << "versão: " << v << "\n";
         
     }
 };
@@ -808,10 +893,10 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    T.inserir(-1, v);
-    T.inserir(3, v);
-    //T.inserir(3,v);
-    T.inserir(4, v);
+    T.deletar(1, v);
+    //T.inserir(-1, v);
+    //T.inserir(3, v);
+    //T.inserir(4, v);
     
     T.teste(v);
     
