@@ -2,7 +2,7 @@
 #include <climits>
 
 #define QTDE_MODS 6
-#define QTDE_VERSOES 101
+#define QTDE_VERSOES 100
 
 using namespace std;
 
@@ -30,14 +30,59 @@ class ArvoreRN{
     //Estrutura do noh
     //Os campos de retorno e formado por apenas um no, ja que em uma arvore, cada no recebe em apontado por no max 1 ponteiro
     //Portanto, o campo de modificações terá apenas 2 espaços
-    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Mod Mods[QTDE_MODS];};
+    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Noh* prox_versao; Mod Mods[QTDE_MODS];};
 
     //Criando um nó sentinela, assim como o Cormen
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
     Noh sentinela;
 
+    
+    Valor ler_impressao(Noh* n, Tag campo, int v){
+        
+        Valor resposta;
+
+        switch(campo){
+            case CHAVE: resposta.k = n->chave; break;
+            case COR:   resposta.c = n->cor;   break;
+            case PAI:   resposta.p = n->pai;   break;
+            case ESQ:   resposta.p = n->esq;   break;
+            case DIR:   resposta.p = n->dir;   break;
+        };
+
+        int j = -1;
+        int v_aux = 0;
+
+        for(int i = 0; i < QTDE_MODS; i++){
+            if(n->Mods[i].tag    == campo and 
+               n->Mods[i].versao <= v     and 
+               n->Mods[i].versao >  v_aux){
+
+                v_aux = n->Mods[i].versao;
+                j = i;
+            }
+        }
+
+        if(j != -1){
+            switch(campo){
+                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
+                case COR:   resposta.c = n->Mods[j].valor.c;   break;
+                default:    resposta.p = n->Mods[j].valor.p;   break;
+            }
+        }
+
+        return resposta;
+    }
+
     Valor ler(Noh* n, Tag campo, int v){
         
+        if(n != &sentinela){
+            //Coloando na ultima versão do no;
+            while (n->prox_versao != &sentinela){
+                n = n->prox_versao;
+            }
+        }
+
+
         Valor resposta;
 
         switch(campo){
@@ -74,7 +119,7 @@ class ArvoreRN{
     //Falta fazer o controle de versões
     //Eu quero que a versão mude apenas quando eu for inserir ou retirar um noh
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
-    void set(Noh* &n, Tag campo, int& v, Valor valor){
+    void set(Noh* n, Tag campo, int& v, Valor valor){
         
         int i = 0;
 
@@ -98,7 +143,9 @@ class ArvoreRN{
                                  ler(n, {ESQ}  , v-1).p, 
                                  ler(n, {DIR}  , v-1).p,
                                  ler(n, {PAI}  , v-1).p,
-                                 n->retorno, 
+                                 n->retorno,
+                                 &sentinela,
+
                                  {
                                     {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
                                     {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
@@ -156,7 +203,7 @@ class ArvoreRN{
                 set(dir, PAI, v, val);
             }
 
-            n = novo;
+            n->prox_versao = novo;
         }
     }
 
@@ -309,29 +356,27 @@ class ArvoreRN{
 
     void imprimir_rec(Noh* r, int v){
 
-        if(ler(r, {ESQ}, v).p  != &sentinela){
-            imprimir_rec(ler(r, {ESQ}, v).p, v);
+        if(ler_impressao(r, {ESQ}, v).p  != &sentinela){
+            imprimir_rec(ler_impressao(r, {ESQ}, v).p, v);
         }
 
-        cout << "Chave: " << ler(r, {CHAVE}, v).k << " Cor: " << ler(r, {COR}, v).c << "\n";
+        cout << "Chave: " << ler_impressao(r, {CHAVE}, v).k 
+             << " Cor: "  << ler_impressao(r, {COR}, v).c << "\n";
 
-        if(ler(r, {DIR}, v).p != &sentinela){
-            imprimir_rec(ler(r, {DIR}, v).p, v);
+        if(ler_impressao(r, {DIR}, v).p != &sentinela){
+            imprimir_rec(ler_impressao(r, {DIR}, v).p, v);
         }
     }
 
     
     void inserir_fixup(Noh* n, int& v){
 
-        Noh* pai = ler(n,PAI,v).p;
+        //Noh* pai = ler(n,PAI,v).p;
         Valor val;
-
+        
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
 
-            cout << "dentro do loop\n";
-
             if (ler(n,PAI,v).p == ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p){
-                cout << "primeiro if\n";
                 Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, DIR, v).p;
 
                 if(ler(y, COR, v).c == 'r'){
@@ -366,12 +411,10 @@ class ArvoreRN{
 
             //continuar com set e get
             else{
-                cout << "segundo caso\n";
                 Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p;
                 cout << ler(y, CHAVE, v).p << "\n";
 
                 if(ler(y, COR, v).c == 'r'){
-                    cout << "primeiro if\n";
                     val.c = {'b'};
                     set(ler(n,PAI,v).p, COR, v, val);
 
@@ -385,7 +428,6 @@ class ArvoreRN{
 
                 
                 else{
-                    cout << "segundo if\n";
 
                     if(n == ler(ler(n,PAI,v).p, ESQ, v).p){
                         n = ler(n,PAI,v).p;
@@ -555,7 +597,7 @@ class ArvoreRN{
     //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
-                           &sentinela, &sentinela, 
+                                   &sentinela, &sentinela, &sentinela,
                            {
                              {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
                              {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
@@ -574,6 +616,7 @@ class ArvoreRN{
             }
         }
 
+
         while(x != &sentinela){
             y = x;
 
@@ -584,12 +627,13 @@ class ArvoreRN{
                 x = ler(x, DIR, v).p;
             }
         }
-        
+
         Valor val;
         val.p = {y};
 
         set(n, PAI, v, val);
 
+        
         //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
 
         if(y == &sentinela){
@@ -737,8 +781,8 @@ int main(){
     
     T.inserir(1, v);
     T.inserir(2, v);
-    //T.inserir(3, v);
-    //T.inserir(4, v);
+    T.inserir(3, v);
+    T.inserir(4, v);
     T.teste(v);
     
 
