@@ -400,11 +400,7 @@ class ArvoreRN{
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
 
             Noh* pai = ler(n, PAI, v).p;
-            if(v == 4){ 
-                cout << "valor do noh pai: " << ler(pai, CHAVE, v).k << "\n";
-                cout << "chave do vo: " << ler(ler(pai, PAI, v).p, CHAVE, v).k << "\n";
-                if(ler(pai, PAI, v).p == &sentinela) cout << "eh sentinela\n";
-            }
+
             if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
                 
                 Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
@@ -681,8 +677,6 @@ class ArvoreRN{
             }
         }
 
-        if(v == 4)
-        cout << "Valor do X no começo: " << ler(x, CHAVE, v).k << "\n";
 
         while(x != &sentinela){
             y = x;
@@ -694,16 +688,10 @@ class ArvoreRN{
                 x = ler(x, DIR, v).p;
             }
         }
-
-        n->pai = y;
         
+        n->pai = y;
         Valor val;
         val.p = {y};
-        
-        if(v == 4){
-            cout << "Valor do y: " << ler(y, CHAVE, v).k << "\n";
-        }
-
         
 
         //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
@@ -723,8 +711,6 @@ class ArvoreRN{
             }
         }
 
-        if(v == 4)
-            cout << "chave do filho esq do y: " << ler(ler(y, DIR, v).p, CHAVE, v).k << "\n";
         
         inserir_fixup(n, v);
     }
@@ -961,10 +947,17 @@ class ArvoreRN{
             imprimir(v);
         }
         
-        inserir(5, v);
-        imprimir(v);
+        //inserir(5, v);
+        //imprimir(v);
         cout << "RAIZ: " << ler(raiz_versao[v], CHAVE, v).k << "\n";
-    }
+
+        if(raiz_versao[v] == ler(ler(raiz_versao[v], DIR, v).p, PAI, v).p)
+            cout << "eh o pai\n";
+        
+        if(raiz_versao[v] == ler(ler(raiz_versao[v], ESQ, v).p, PAI, v).p)
+            cout << "eh o pai\n";
+
+    }   
 };
 
 
