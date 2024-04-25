@@ -7,7 +7,7 @@
 using namespace std;
 
 enum Tag{
-    CHAVE, COR, PAI, ESQ, DIR
+    CHAVE, COR, PAI, ESQ, DIR, NULO
 };
 
 class ArvoreRN{
@@ -92,21 +92,14 @@ class ArvoreRN{
             case DIR:   resposta.p = n->dir;   break;
         };
 
-        int j = -1;
-        int v_aux = 0;
 
         for(int i = 0; i < QTDE_MODS; i++){
-            if(n->Mods[i].tag == campo and n->Mods[i].versao <= v and n->Mods[i].versao > v_aux){
-                v_aux = n->Mods[i].versao;
-                j = i;
-            }
-        }
-
-        if(j != -1){
-            switch(campo){
-                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
-                case COR:   resposta.c = n->Mods[j].valor.c;   break;
-                default:    resposta.p = n->Mods[j].valor.p;   break;
+            if(n->Mods[i].tag == campo and n->Mods[i].versao <= v){
+                switch(campo){
+                    case CHAVE: resposta.k = n->Mods[i].valor.k;   break;
+                    case COR:   resposta.c = n->Mods[i].valor.c;   break;
+                    default:    resposta.p = n->Mods[i].valor.p;   break;
+                }
             }
         }
 
@@ -120,13 +113,20 @@ class ArvoreRN{
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
     void set(Noh* n, Tag campo, int& v, Valor valor){
         
+        //Colocando na ultima versão do noh
+        while(n->prox_versao != &sentinela){
+            n = n->prox_versao;
+        }
+
+
         int i = 0;
 
+        //Procurando MODS vazio
         while (i < QTDE_MODS && 
-              (n->Mods[i].versao != v || n->Mods[i].tag != campo) &&
-               n->Mods[i].versao != -1){
+                (n->Mods[i].versao != v || n->Mods[i].tag != campo) &&
+                n->Mods[i].versao != -1){
 
-            i = i + 1;
+            i = i + 1;  
         }
 
         //Caso ainda tenha espaço no mods
@@ -138,20 +138,20 @@ class ArvoreRN{
 
         //Caso não tenha espaço no mods
         else{
-
+            //cout << "não tem espaço\n";
             //Duplicando o no
-            Noh* novo = new Noh {ler(n, {CHAVE}, v-1).k, 
-                                 ler(n, {COR}  , v-1).c, 
-                                 ler(n, {ESQ}  , v-1).p, 
-                                 ler(n, {DIR}  , v-1).p,
-                                 ler(n, {PAI}  , v-1).p,
+            Noh* novo = new Noh {ler(n, {CHAVE}, v).k, 
+                                 ler(n, {COR}  , v).c, 
+                                 ler(n, {ESQ}  , v).p, 
+                                 ler(n, {DIR}  , v).p,
+                                 ler(n, {PAI}  , v).p,
                                  n->retorno,
                                  &sentinela,
 
                                  {
-                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
-                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
-                                    {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}
+                                    {-1, {NULO}, {0}},{-1, {NULO}, {0}},
+                                    {-1, {NULO}, {0}},{-1, {NULO}, {0}},
+                                    {-1, {NULO}, {0}},{-1, {NULO}, {0}}
                                  
                                  }
 
@@ -165,12 +165,18 @@ class ArvoreRN{
                 case COR:   novo->cor   = valor.c; break;
             }
 
+            n->prox_versao = novo;
+
+
             Valor val;
             val.p = {novo};
-            
+
+
             //Caso de N ser raiz
-            if(ler(n, {PAI}, v-1).p == &sentinela){
+            if(novo->pai == &sentinela){
+
                 raiz_versao[v] = novo;
+
                 for(int i = v; i < QTDE_VERSOES; i++){
                     raiz_versao[i] = novo;
                 }
@@ -178,34 +184,42 @@ class ArvoreRN{
 
             //Caso N não seja raiz
             else{
-                
-                Noh* pai = ler(n, {PAI}, v).p;
+                Noh* pai = novo->pai;
 
-                //Caso N seja filho esq
-                if(ler(pai, {CHAVE}, v).k > novo->chave){
-                    set(pai, ESQ, v, val);
-                }
 
-                //Caso N seja filho dir
-                else{
-                    set(pai, DIR, v, val);
+                if (pai != &sentinela){
+
+                    //Caso N seja filho esq
+                    if(ler(pai, ESQ, v).p == n){
+                        set(pai, ESQ, v, val);
+                    }
+
+                    //Caso N seja filho dir
+                    else{
+                        //cout << ler(ler(pai, DIR, v).p, CHAVE, v).k << "\n";
+                        set(pai, DIR, v, val);
+                    }
                 }
             }
 
-            Noh* esq = ler(n, {ESQ}, v).p;
-            Noh* dir = ler(n, {DIR}, v).p;
+
+            Noh* esq = novo->esq;
+            Noh* dir = novo->dir;
 
             //Avisando para os filhos trocarem de pai
 
             if(esq != &sentinela){
+                //cout << ler(dir, CHAVE, v).k << "\n";
+
                 set(esq, PAI, v, val);
             }
 
             if(dir != &sentinela){
+                //cout << ler(dir, CHAVE, v).k << "\n";
                 set(dir, PAI, v, val);
             }
 
-            n->prox_versao = novo;
+
         }
     }
 
@@ -246,9 +260,12 @@ class ArvoreRN{
         //y = x->dir
         Noh* y = ler(x, DIR, v).p;
 
+
         //x->dir = y->esq;
         val = ler(y, ESQ, v);
+
         set(x, DIR, v, val);
+
 
         if(ler(y, ESQ, v).p != &sentinela){
             //y->esq->pai= x;
@@ -256,9 +273,11 @@ class ArvoreRN{
             set(ler(y, ESQ, v).p, PAI, v, val);
         }
         
+
         //y->pai = x->pai;
         val = ler(x, PAI, v);
         set(y, PAI, v, val);
+
 
         if(ler(x,PAI,v).p == &sentinela){
             raiz_versao[v] = y;
@@ -276,8 +295,10 @@ class ArvoreRN{
             }
         }
 
+
         val.p = {x};
         set(y, ESQ, v, val);
+
 
         val.p = {y};
         set(y, PAI, v, val);
@@ -375,83 +396,88 @@ class ArvoreRN{
 
         //Noh* pai = ler(n,PAI,v).p;
         Valor val;
-        
+
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
 
-            if (ler(n,PAI,v).p == ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p){
-                Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, DIR, v).p;
-
+            Noh* pai = ler(n, PAI, v).p;
+            if(v == 4){ 
+                cout << "valor do noh pai: " << ler(pai, CHAVE, v).k << "\n";
+                cout << "chave do vo: " << ler(ler(pai, PAI, v).p, CHAVE, v).k << "\n";
+                if(ler(pai, PAI, v).p == &sentinela) cout << "eh sentinela\n";
+            }
+            if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
+                
+                Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
+                
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
-                    set(ler(n,PAI,v).p, COR, v, val);
+                    set(pai, COR, v, val);
 
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
+                    set(ler(pai, PAI, v).p, COR, v, val);
                     
-                    n = ler(ler(n,PAI,v).p, PAI, v).p;
+                    n = ler(pai, PAI, v).p;
                 }
 
                 
                 else{
-                    if(n == ler(ler(n,PAI,v).p, DIR, v).p){
-                        n = ler(n,PAI,v).p;
+                    if(n == ler(pai, DIR, v).p){
+                        n = pai;
                         rotacionar_esq(n, v);
                     }
 
                     val.c = {'b'};
 
-                    set(ler(n,PAI,v).p, COR, v, val);
+                    set(pai, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
+                    set(ler(pai, PAI, v).p, COR, v, val);
 
-                    rotacionar_dir(ler(ler(n,PAI,v).p, PAI, v).p, v);
+                    rotacionar_dir(ler(pai, PAI, v).p, v);
                 }
             }
 
             //continuar com set e get
             else{
-                Noh* y = ler(ler(ler(n,PAI,v).p, PAI, v).p, ESQ, v).p;
+                Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
-                    set(ler(n,PAI,v).p, COR, v, val);
+                    set(pai, COR, v, val);
 
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
+                    set(ler(pai, PAI, v).p, COR, v, val);
                     
-                    n = ler(ler(n,PAI,v).p, PAI, v).p;
+                    n = ler(pai, PAI, v).p;
                 }
 
                 
                 else{
-                    if(n == ler(ler(n,PAI,v).p, ESQ, v).p){
-                        n = ler(n,PAI,v).p;
+                    if(n == ler(pai, ESQ, v).p){
+                        n = pai;
                         rotacionar_dir(n, v);
                     }
-
-                    
                     val.c = {'b'};
 
-                    set(ler(n,PAI,v).p, COR, v, val);
-                    
+                    set(pai, COR, v, val);
                     val.c = {'r'};
 
-                    set(ler(ler(n,PAI,v).p, PAI, v).p, COR, v, val);
+                    set(ler(pai, PAI, v).p, COR, v, val);
 
-                    rotacionar_esq(ler(ler(n,PAI,v).p, PAI, v).p, v);
+                    rotacionar_esq(ler(pai, PAI, v).p, v);
 
                 }      
             }
-
+        
         }
 
         val.c = {'b'};
 
+        /*
         if(v == 3){
             if(raiz_versao[3] == &sentinela){
                 cout << "eh sentinela\n";
@@ -459,7 +485,7 @@ class ArvoreRN{
             else{
                 cout << ler(ler(raiz_versao[2], DIR, 2).p, CHAVE, 2).k << "\n"; 
             }
-        }
+        }*/
 
         //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
@@ -634,9 +660,9 @@ class ArvoreRN{
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
                                    &sentinela, &sentinela, &sentinela,
                            {
-                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
-                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}},
-                             {-1, {CHAVE}, {0}},{-1, {CHAVE}, {0}}
+                             {-1, {NULO}, {0}},{-1, {NULO}, {0}},
+                             {-1, {NULO}, {0}},{-1, {NULO}, {0}},
+                             {-1, {NULO}, {0}},{-1, {NULO}, {0}}
                            }};
 
 
@@ -655,6 +681,8 @@ class ArvoreRN{
             }
         }
 
+        if(v == 4)
+        cout << "Valor do X no começo: " << ler(x, CHAVE, v).k << "\n";
 
         while(x != &sentinela){
             y = x;
@@ -667,12 +695,17 @@ class ArvoreRN{
             }
         }
 
+        n->pai = y;
+        
         Valor val;
         val.p = {y};
-
-        set(n, PAI, v, val);
+        
+        if(v == 4){
+            cout << "Valor do y: " << ler(y, CHAVE, v).k << "\n";
+        }
 
         
+
         //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
 
         if(y == &sentinela){
@@ -689,6 +722,9 @@ class ArvoreRN{
                 set(y, DIR, v, val);
             }
         }
+
+        if(v == 4)
+            cout << "chave do filho esq do y: " << ler(ler(y, DIR, v).p, CHAVE, v).k << "\n";
         
         inserir_fixup(n, v);
     }
@@ -840,7 +876,11 @@ class ArvoreRN{
     }
 
     void imprimir(int v){
+        cout << "ÁRVORE VERSÂO " << v << "\n";
+
         imprimir_rec(raiz_versao[v], v);
+
+        cout << "\n";
     }
 
     int sucessor(int k, int v){
@@ -886,10 +926,31 @@ class ArvoreRN{
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
 
-        //set(raiz_versao[v], CHAVE, v, {5});
-        //set(raiz_versao[v], CHAVE, v, {3});
-        
-        //set(raiz_versao[v], CHAVE, v, {4});
+        set(raiz_versao[v], CHAVE, v, {2});
+        set(raiz_versao[v], CHAVE, v, {3});
+        set(raiz_versao[v], CHAVE, v, {5});
+        set(raiz_versao[v], CHAVE, v, {6});
+        set(raiz_versao[v], CHAVE, v, {7});
+        set(raiz_versao[v], CHAVE, v, {8});
+        set(raiz_versao[v], CHAVE, v, {9});
+        set(raiz_versao[v], CHAVE, v, {10});
+        set(raiz_versao[v], CHAVE, v, {11});
+
+        Noh* n = ler(raiz_versao[v], DIR, v).p;
+        set(n, CHAVE, v, {4});
+        set(n, CHAVE, v, {5});
+        set(n, CHAVE, v, {6});
+        set(n, CHAVE, v, {7});
+        set(n, CHAVE, v, {8});
+        set(n, CHAVE, v, {9});
+        set(n, CHAVE, v, {20});
+        set(n, CHAVE, v, {43});
+        set(n, CHAVE, v, {2});
+        set(n, CHAVE, v, {14});
+        set(n, CHAVE, v, {5});
+        set(n, CHAVE, v, {565});
+        set(n, CHAVE, v, {15});
+
 
         //set(raiz_versao[v], CHAVE, v, {5});
         if(raiz_versao[v] == &sentinela){
@@ -897,13 +958,12 @@ class ArvoreRN{
         }
 
         else{
-            imprimir(2);
-            cout << "\n";
             imprimir(v);
         }
-
-        cout << "versão: " << v << "\n";
         
+        inserir(5, v);
+        imprimir(v);
+        cout << "RAIZ: " << ler(raiz_versao[v], CHAVE, v).k << "\n";
     }
 };
 
@@ -914,16 +974,23 @@ int main(){
     
     int v = 0;
     
-    /*
-    T.inserir(1, v);
-    T.inserir(2, v);
-    T.inserir(3, v);
-    */
-
     
     T.inserir(1, v);
     T.inserir(2, v);
-    T.deletar(2, v);
+    T.inserir(3, v);
+
+    //T.inserir(5, v);
+
+    //T.imprimir(v);
+    
+    
+    /*
+    for(int i = 1; i < 5; i++){
+        T.inserir(i, v);
+        T.imprimir(v);
+    }
+    */
+
     //T.inserir(-1, v);
     //T.inserir(3, v);
     //T.inserir(4, v);
