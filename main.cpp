@@ -397,8 +397,10 @@ class ArvoreRN{
         //Noh* pai = ler(n,PAI,v).p;
         Valor val;
 
+        //if(v == 4) imprimir(v);
+
+
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
-            if(ler(n, CHAVE, v).k == 2) cout << "ainda vim aqui de novo\n";
             Noh* pai = ler(n, PAI, v).p;
 
             if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
@@ -419,6 +421,7 @@ class ArvoreRN{
 
                 
                 else{
+
                     if(n == ler(pai, DIR, v).p){
                         n = pai;
                         rotacionar_esq(n, v);
@@ -438,8 +441,6 @@ class ArvoreRN{
             //continuar com set e get
             else{
                 Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
-                if(v == 4) cout << "chave do y: " << ler(y, CHAVE, v).k << "\n";
-                if(v == 4) cout << "cor do y: " << ler(y, COR, v).c << "\n";
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
@@ -449,20 +450,13 @@ class ArvoreRN{
                     
                     val.c = {'r'};
                     set(ler(pai, PAI, v).p, COR, v, val);
-                    
-                    if(v==4){
-                        cout << "\ndepois de mudar as coisas:\n";
-                        cout << "cor do pai: " << ler(pai, COR, v).c << "\n";
-                        cout << "cor do y: " << ler(y, COR, v).c << "\n";
-                        cout << "cor do vo: " << ler(ler(pai, PAI, v).p, COR, v).c << "\n";
-                    }
-
+    
                     n = ler(pai, PAI, v).p;
-                    cout << "valor do n: " << ler(n, CHAVE, v).k << "\n";
                 }
 
                 
                 else{
+
                     if(n == ler(pai, ESQ, v).p){
                         n = pai;
                         rotacionar_dir(n, v);
@@ -478,11 +472,12 @@ class ArvoreRN{
 
                 }      
             }
+
         
         }
 
-        cout << ler(n, CHAVE, v).k << "\n";
-        cout << ler(raiz_versao[v], CHAVE, v).k << "\n";
+        //cout << ler(n, CHAVE, v).k << "\n";
+        //cout << ler(raiz_versao[v], CHAVE, v).k << "\n";
         val.c = {'b'};
 
         /*
@@ -494,11 +489,12 @@ class ArvoreRN{
                 cout << ler(ler(raiz_versao[2], DIR, 2).p, CHAVE, 2).k << "\n"; 
             }
         }*/
-
+        if(v == 4) imprimir(v);
         //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
         //TÁ DANDO ERRADO AQUI NO FIXUP A RAIZ TÁ FICANDO SEMPRE PRETA
         //NA PRIMEIRA VERSÂO ISSO TÁ ERRADO
+        if(v == 4)imprimir(v);
     }
 
     /*
@@ -666,6 +662,7 @@ class ArvoreRN{
     //Acho que terminei
     //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
+
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
                                    &sentinela, &sentinela, &sentinela,
                            {
@@ -679,6 +676,20 @@ class ArvoreRN{
         Noh *x = raiz_versao[v];
 
         v = v+1;
+
+        if(v == 4){
+            cout << "raiz:  " << ler(raiz_versao[v], CHAVE, v).k;
+            cout << " cor: " << ler(raiz_versao[v], COR, v).c << "\n";
+
+            Noh* dir = ler(raiz_versao[v], DIR, v).p;
+            Noh* esq = ler(raiz_versao[v], ESQ, v).p;
+
+            cout << "dir:  " << ler(dir, CHAVE, v).k;
+            cout << " cor: " << ler(dir, COR, v).c << "\n";
+
+            cout << "esq:  " << ler(esq, CHAVE, v).k;
+            cout << " cor: " << ler(esq, COR, v).c << "\n";
+        }
 
         if(v == QTDE_VERSOES){
             cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
@@ -712,6 +723,10 @@ class ArvoreRN{
         if(y == &sentinela){
             sentinela.pai = n;
             raiz_versao[v] = n; 
+            
+            for(int i = v; i < QTDE_VERSOES; i++){
+                raiz_versao[i] = n;
+            }
         }
 
         else{
