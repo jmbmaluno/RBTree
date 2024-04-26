@@ -571,6 +571,7 @@ class ArvoreRN{
     }
 
 
+    /*
     void delete_fixup(Noh* x, int& v){
         Noh* w;
 
@@ -638,10 +639,118 @@ class ArvoreRN{
 
         x->cor = 'b';
     }
+    */
 
 
     void delete_fixup(Noh* x, int&v){
         Noh* w;
+        Valor val;
+
+        while(x != raiz_versao[v] && ler(x, COR, v).c == 'b'){
+            if(x == ler(ler(x, PAI, v).p, ESQ, v).p){
+                w = ler(ler(x, PAI, v).p, DIR, v).p;
+
+                if(ler(w, COR, v).c == 'r'){
+                    val.c = {'b'};
+                    set(w, COR, v, val);
+
+                    val.c = {'r'};
+                    set(ler(x, PAI, v).p, COR, v, val);
+
+                    rotacionar_esq(ler(x, PAI, v).p, v);
+
+                    w = ler(ler(x, PAI, v).p, DIR, v).p;
+                }
+
+                if(ler(ler(w, ESQ, v).p, COR, v).c == 'b' &&
+                   ler(ler(w, DIR, v).p, COR, v).c == 'b'){
+                    
+                    val.c = 'r';
+                    set(w, COR, v, val);
+
+                    x = ler(x, PAI, v).p;
+                }
+
+                else{
+                    if(ler(ler(w, DIR, v).p, COR, v).c == 'b'){
+                        val.c = 'b';
+                        set(ler(w, ESQ, v).p, COR, v, val);
+
+                        val.c = 'r';
+                        set(w, COR, v, val);
+
+                        rotacionar_dir(w, v);
+
+                        w = ler(ler(x, PAI, v).p, DIR, v).p;
+                    }
+
+                    val.c = ler(ler(x, PAI, v).p, COR, v).c;
+                    set(w, COR, v, val);
+
+                    val.c = 'b';
+                    set(ler(x, PAI, v).p, COR, v, val);
+
+                    set(ler(w, DIR, v).p, COR, v, val);
+
+                    rotacionar_esq(ler(x, PAI, v).p, v);
+
+                    x = raiz_versao[v];
+                }
+            }
+
+            else{
+                w = ler(ler(x, PAI, v).p, ESQ, v).p;
+
+                if(ler(w, COR, v).c == 'r'){
+                    val.c = {'b'};
+                    set(w, COR, v, val);
+
+                    val.c = {'r'};
+                    set(ler(x, PAI, v).p, COR, v, val);
+
+                    rotacionar_dir(ler(x, PAI, v).p, v);
+
+                    w = ler(ler(x, PAI, v).p, ESQ, v).p;
+                }
+
+                if(ler(ler(w, ESQ, v).p, COR, v).c == 'b' &&
+                   ler(ler(w, DIR, v).p, COR, v).c == 'b'){
+                    
+                    val.c = 'r';
+                    set(w, COR, v, val);
+
+                    x = ler(x, PAI, v).p;
+                }
+                else{
+                    if(ler(ler(w, ESQ, v).p, COR, v).c == 'b'){
+                        val.c = 'b';
+                        set(ler(w, DIR, v).p, COR, v, val);
+
+                        val.c = 'r';
+                        set(w, COR, v, val);
+
+                        rotacionar_esq(w, v);
+
+                        w = ler(ler(x, PAI, v).p, ESQ, v).p;
+                    }
+
+                    val.c = ler(ler(x, PAI, v).p, COR, v).c;
+                    set(w, COR, v, val);
+
+                    val.c = 'b';
+                    set(ler(x, PAI, v).p, COR, v, val);
+
+                    set(ler(w, ESQ, v).p, COR, v, val);
+
+                    rotacionar_dir(ler(x, PAI, v).p, v);
+
+                    x = raiz_versao[v];
+                }
+            }
+        }
+
+        val.c = 'b';
+        set(x, COR, v, val);
     }
 
     Noh* buscar_rec(Noh* r, int k, int &v){
