@@ -410,7 +410,7 @@ class ArvoreRN{
         //Noh* pai = ler(n,PAI,v).p;
         Valor val;
 
-        //if(v == 4) imprimir(v);
+        //if(v == 4) (v);
 
 
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
@@ -674,6 +674,12 @@ class ArvoreRN{
     //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
 
+
+        if(v >= QTDE_VERSOES-1){
+            cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
+            return;
+        }
+
         Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
                                    &sentinela, &sentinela, &sentinela,
                            {
@@ -687,10 +693,6 @@ class ArvoreRN{
         Noh *x = raiz_versao[v];
 
         v = v+1;
-
-        if(v == QTDE_VERSOES){
-            cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
-        }
 
         if(v == 1){
             for(int i = 0; i < QTDE_VERSOES; i++){
@@ -886,11 +888,18 @@ class ArvoreRN{
     }
 
     void imprimir(int v){
-        cout << "ÁRVORE VERSÂO " << v << "\n";
 
-        imprimir_rec(raiz_versao[v], v);
+        if(v >= QTDE_VERSOES-1){
+            cout << "Não há como imprimir essa versão\n";
+        }
 
-        cout << "\n";
+        else{
+            cout << "ÁRVORE VERSÂO " << v << "\n";
+
+            imprimir_rec(raiz_versao[v], v);
+
+            cout << "\n";
+        }
     }
 
     int sucessor(int k, int v){
@@ -993,7 +1002,7 @@ int main(){
     
     
     
-    for(int i = 1; i < 100; i++){
+    for(int i = 1; i < 102; i++){
         T.inserir(i, v);
         T.imprimir(v);
     }
