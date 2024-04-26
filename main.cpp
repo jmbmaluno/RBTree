@@ -302,7 +302,7 @@ class ArvoreRN{
 
         val.p = {y};
         set(x, PAI, v, val);
-
+        //TEM QUE ATUALIZAR O VETOR DE RAIZES DAS VERSOES
     }
 
     //Rotação a direita
@@ -375,6 +375,7 @@ class ArvoreRN{
 
         val.p = {y};
         set(x, PAI, v, val);
+        //TEM QUE ATUALIZAR O VETOR DE RAIZES DAS VERSOES
     }
 
     void imprimir_rec(Noh* r, int v){
