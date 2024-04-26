@@ -546,11 +546,13 @@ class ArvoreRN{
         Valor val;
 
         if(ler(u, PAI, v).p == &sentinela){
-            sentinela.pai = n;
+            for(int i = v; i < QTDE_VERSOES; i++){
+                raiz_versao[v] = n;
+            }
         }
         else{
             val.p = {n};
-            if(u == ler(ler(u, PAI, v).p, ESQ, v).p){
+            if( u == ler(ler(u, PAI, v).p, ESQ, v).p){
                 set(ler(u, PAI, v).p, ESQ, v, val);
             }
             else{
@@ -917,7 +919,7 @@ class ArvoreRN{
         
         v = v+1;
 
-        if(v == QTDE_VERSOES){
+        if(v >= QTDE_VERSOES-1){
             cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
         }
 
@@ -925,13 +927,11 @@ class ArvoreRN{
             return;
         }
 
-        Noh* z_aux = z;
-        Noh* y = z;
-        Noh* x;
-
-        char y_cor_original = ler(y, COR, v).c;
-
-        if(ler(z, ESQ, v).p == &sentinela){
+       Noh* y = z;
+       Noh* x;
+       char y_original_cor = ler(y, COR, v).c;
+    
+       if(ler(z, ESQ, v).p == &sentinela){
             x = ler(z, DIR, v).p;
             transplantar(z, ler(z, DIR, v).p, v);
         }
@@ -941,61 +941,43 @@ class ArvoreRN{
                 x = ler(z, ESQ, v).p;
                 transplantar(z, ler(z, ESQ, v).p, v);
             }
-
             else{
                 y = minimo(ler(z, DIR, v).p, v);
-                y_cor_original = ler(y, COR, v).c;
+                y_original_cor = ler(y, COR, v).c;
                 x = ler(y, DIR, v).p;
 
-                if(ler(y, PAI, v).p == z){
-                    val.p = {y};
-                    set(x, PAI, v, val);
+                if( y != ler(z, DIR, v).p){
+                    transplantar(y, ler(y, DIR, v).p, v);
+
+                    val.p = ler(z, DIR, v).p;
+                    set(y, DIR, v, val);
+                    
+                    val.p = y;
+                    set(ler(y, DIR, v).p, PAI, v, val);
                 }
 
                 else{
-                    transplantar(y, ler(y, DIR, v).p, v);
+                    val.p = y;
+                    set(x, PAI, v, val);
 
-                    val.p ={ler(z, DIR, v).p};
-                    set(y, DIR, v, val);
-                    
-                    val.p = {y};
-                    set(ler(y,DIR,v).p, PAI, v, val);
+                    transplantar(z, y, v);
+
+                    val.p = ler(z, ESQ, v).p;
+                    set(y, ESQ, v, val);
+
+                    val.p = y;
+                    set(ler(y, ESQ, v).p, PAI, v, val);
+
+                    val.c = ler(z, COR, v).c;
+                    set(y, COR, v, val);
                 }
-
-                transplantar(z, y, v);
-
-                val.p = {ler(z, ESQ, v).p};
-                set(y, ESQ, v, val);
-
-                val.p = {y};
-                set(ler(y, ESQ, v).p, PAI, v, val);
-
-                val.c = {ler(z, COR, v).c};
-                set(y, COR, v, val);
             }
         }
 
-        
-        if(y_cor_original == 'b'){
-            cout << "cai nesse caso\n";
+        if(y_original_cor == 'b'){
+            cout << "vim pra ca\n";
             delete_fixup(x, v);
         }
-
-
-        val.p = {&sentinela};
-
-        set(ler(z_aux, ESQ, v).p, PAI, v, val);
-        set(ler(z_aux, DIR, v).p, PAI, v, val);
-
-        Noh* pai_antigo = ler(z_aux, PAI, v).p;
-
-        if(ler(pai_antigo, ESQ, v).p == z_aux){
-            set(pai_antigo, ESQ, v, val);
-        }
-        else{
-            set(pai_antigo, DIR, v, val);
-        }
-
     }
 
     Noh* buscar(int k, int& v){
@@ -1059,8 +1041,12 @@ class ArvoreRN{
     //ler(Noh* n, Tag campo, int v)
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
+        Noh * dir = ler(raiz_versao[v], DIR, v).p;
+        Noh* dirdir = ler(dir, DIR, v).p;
 
-        
+        cout << "dir: " << ler(dir, CHAVE, v).k << "\n";
+        cout << "dirdir: " << ler(dirdir, CHAVE, v).k << "\n";
+        /*
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
         set(raiz_versao[v], CHAVE, v, {5});
@@ -1096,6 +1082,7 @@ class ArvoreRN{
         }        
         //inserir(5, v);
         //imprimir(v);
+        */
 
     }   
 };
@@ -1108,19 +1095,23 @@ int main(){
     int v = 0;
     
     
-    //T.inserir(1, v);
-    //T.inserir(2, v);
-    //T.inserir(3, v);
-    //T.inserir(5, v);
+    T.inserir(1, v);
+    T.inserir(2, v);
+    T.inserir(3, v);
+    T.inserir(5, v);
 
-    //T.imprimir(v);
+    T.teste(v);
+
+    //T.deletar(5, v);
+
+    T.imprimir(v);
     
     
-    
+    /*
     for(int i = 1; i < 102; i++){
         T.inserir(i, v);
         T.imprimir(v);
-    }
+    }*/
     
 
     //T.inserir(-1, v);
