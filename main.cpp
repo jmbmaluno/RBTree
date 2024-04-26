@@ -301,7 +301,7 @@ class ArvoreRN{
 
 
         val.p = {y};
-        set(y, PAI, v, val);
+        set(x, PAI, v, val);
 
     }
 
@@ -374,7 +374,7 @@ class ArvoreRN{
         set(y, DIR, v, val);
 
         val.p = {y};
-        set(y, PAI, v, val);
+        set(x, PAI, v, val);
     }
 
     void imprimir_rec(Noh* r, int v){
@@ -398,7 +398,7 @@ class ArvoreRN{
         Valor val;
 
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
-
+            if(ler(n, CHAVE, v).k == 2) cout << "ainda vim aqui de novo\n";
             Noh* pai = ler(n, PAI, v).p;
 
             if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
@@ -438,6 +438,8 @@ class ArvoreRN{
             //continuar com set e get
             else{
                 Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
+                if(v == 4) cout << "chave do y: " << ler(y, CHAVE, v).k << "\n";
+                if(v == 4) cout << "cor do y: " << ler(y, COR, v).c << "\n";
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
@@ -448,7 +450,15 @@ class ArvoreRN{
                     val.c = {'r'};
                     set(ler(pai, PAI, v).p, COR, v, val);
                     
+                    if(v==4){
+                        cout << "\ndepois de mudar as coisas:\n";
+                        cout << "cor do pai: " << ler(pai, COR, v).c << "\n";
+                        cout << "cor do y: " << ler(y, COR, v).c << "\n";
+                        cout << "cor do vo: " << ler(ler(pai, PAI, v).p, COR, v).c << "\n";
+                    }
+
                     n = ler(pai, PAI, v).p;
+                    cout << "valor do n: " << ler(n, CHAVE, v).k << "\n";
                 }
 
                 
@@ -471,6 +481,8 @@ class ArvoreRN{
         
         }
 
+        cout << ler(n, CHAVE, v).k << "\n";
+        cout << ler(raiz_versao[v], CHAVE, v).k << "\n";
         val.c = {'b'};
 
         /*
@@ -485,7 +497,8 @@ class ArvoreRN{
 
         //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
-        
+        //TÁ DANDO ERRADO AQUI NO FIXUP A RAIZ TÁ FICANDO SEMPRE PRETA
+        //NA PRIMEIRA VERSÂO ISSO TÁ ERRADO
     }
 
     /*
@@ -710,7 +723,6 @@ class ArvoreRN{
                 set(y, DIR, v, val);
             }
         }
-
         
         inserir_fixup(n, v);
     }
@@ -912,6 +924,7 @@ class ArvoreRN{
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
 
+        /*
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
         set(raiz_versao[v], CHAVE, v, {5});
@@ -935,8 +948,7 @@ class ArvoreRN{
         set(n, CHAVE, v, {14});
         set(n, CHAVE, v, {5});
         set(n, CHAVE, v, {565});
-        set(n, CHAVE, v, {15});
-
+        set(n, CHAVE, v, {15});*/
 
         //set(raiz_versao[v], CHAVE, v, {5});
         if(raiz_versao[v] == &sentinela){
@@ -946,16 +958,11 @@ class ArvoreRN{
         else{
             imprimir(v);
         }
+
+        imprimir(v-1);
         
         //inserir(5, v);
         //imprimir(v);
-        cout << "RAIZ: " << ler(raiz_versao[v], CHAVE, v).k << "\n";
-
-        if(raiz_versao[v] == ler(ler(raiz_versao[v], DIR, v).p, PAI, v).p)
-            cout << "eh o pai\n";
-        
-        if(raiz_versao[v] == ler(ler(raiz_versao[v], ESQ, v).p, PAI, v).p)
-            cout << "eh o pai\n";
 
     }   
 };
@@ -971,8 +978,7 @@ int main(){
     T.inserir(1, v);
     T.inserir(2, v);
     T.inserir(3, v);
-
-    //T.inserir(5, v);
+    T.inserir(5, v);
 
     //T.imprimir(v);
     
@@ -988,7 +994,7 @@ int main(){
     //T.inserir(3, v);
     //T.inserir(4, v);
     
-    T.teste(v);
+    //T.teste(v);
     
 
 }
