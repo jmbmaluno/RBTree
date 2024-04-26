@@ -134,6 +134,12 @@ class ArvoreRN{
             n->Mods[i].versao = v;
             n->Mods[i].valor = valor;
             n->Mods[i].tag = campo;
+
+            if(campo == PAI && valor.p == &sentinela){
+                for(int i = v; i < QTDE_VERSOES; i++){
+                    raiz_versao[i] = n;
+                }
+            }
         }
 
         //Caso não tenha espaço no mods
@@ -159,7 +165,13 @@ class ArvoreRN{
 
             switch(campo){
                 case CHAVE: novo->chave = valor.k; break;
-                case PAI:   novo->pai   = valor.p; break;
+                case PAI:   novo->pai   = valor.p; 
+                            if(valor.p == &sentinela){
+                                for(int i = v; i < QTDE_VERSOES; i++){
+                                    raiz_versao[i] = novo;
+                                }
+                            }
+                            break;
                 case ESQ:   novo->esq   = valor.p; break;
                 case DIR:   novo->dir   = valor.p; break;
                 case COR:   novo->cor   = valor.c; break;
@@ -490,12 +502,10 @@ class ArvoreRN{
                 cout << ler(ler(raiz_versao[2], DIR, 2).p, CHAVE, 2).k << "\n"; 
             }
         }*/
-        if(v == 4) imprimir(v);
         //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
         //TÁ DANDO ERRADO AQUI NO FIXUP A RAIZ TÁ FICANDO SEMPRE PRETA
         //NA PRIMEIRA VERSÂO ISSO TÁ ERRADO
-        if(v == 4)imprimir(v);
     }
 
     /*
@@ -677,20 +687,6 @@ class ArvoreRN{
         Noh *x = raiz_versao[v];
 
         v = v+1;
-
-        if(v == 4){
-            cout << "raiz:  " << ler(raiz_versao[v], CHAVE, v).k;
-            cout << " cor: " << ler(raiz_versao[v], COR, v).c << "\n";
-
-            Noh* dir = ler(raiz_versao[v], DIR, v).p;
-            Noh* esq = ler(raiz_versao[v], ESQ, v).p;
-
-            cout << "dir:  " << ler(dir, CHAVE, v).k;
-            cout << " cor: " << ler(dir, COR, v).c << "\n";
-
-            cout << "esq:  " << ler(esq, CHAVE, v).k;
-            cout << " cor: " << ler(esq, COR, v).c << "\n";
-        }
 
         if(v == QTDE_VERSOES){
             cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
@@ -940,7 +936,7 @@ class ArvoreRN{
     //set (Noh* n, Tag campo, int& v, Valor valor)
     void teste(int& v){    
 
-        /*
+        
         set(raiz_versao[v], CHAVE, v, {2});
         set(raiz_versao[v], CHAVE, v, {3});
         set(raiz_versao[v], CHAVE, v, {5});
@@ -964,7 +960,7 @@ class ArvoreRN{
         set(n, CHAVE, v, {14});
         set(n, CHAVE, v, {5});
         set(n, CHAVE, v, {565});
-        set(n, CHAVE, v, {15});*/
+        set(n, CHAVE, v, {15});
 
         //set(raiz_versao[v], CHAVE, v, {5});
         if(raiz_versao[v] == &sentinela){
@@ -973,10 +969,7 @@ class ArvoreRN{
 
         else{
             imprimir(v);
-        }
-
-        imprimir(v-1);
-        
+        }        
         //inserir(5, v);
         //imprimir(v);
 
@@ -991,20 +984,20 @@ int main(){
     int v = 0;
     
     
-    T.inserir(1, v);
-    T.inserir(2, v);
-    T.inserir(3, v);
-    T.inserir(5, v);
+    //T.inserir(1, v);
+    //T.inserir(2, v);
+    //T.inserir(3, v);
+    //T.inserir(5, v);
 
     //T.imprimir(v);
     
     
-    /*
-    for(int i = 1; i < 5; i++){
+    
+    for(int i = 1; i < 100; i++){
         T.inserir(i, v);
         T.imprimir(v);
     }
-    */
+    
 
     //T.inserir(-1, v);
     //T.inserir(3, v);
