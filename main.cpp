@@ -570,6 +570,7 @@ class ArvoreRN{
         return x;
     }
 
+
     void delete_fixup(Noh* x, int& v){
         Noh* w;
 
@@ -636,6 +637,11 @@ class ArvoreRN{
         }
 
         x->cor = 'b';
+    }
+
+
+    void delete_fixup(Noh* x, int&v){
+        Noh* w;
     }
 
     Noh* buscar_rec(Noh* r, int k, int &v){
@@ -863,7 +869,7 @@ class ArvoreRN{
         
         if(y_cor_original == 'b'){
             cout << "cai nesse caso\n";
-            //delete_fixup(x, v);
+            delete_fixup(x, v);
         }
 
 
