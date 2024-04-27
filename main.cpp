@@ -114,6 +114,7 @@ class ArvoreRN{
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
     void set(Noh* n, Tag campo, int& v, Valor valor){
         
+        if (n == &sentinela) return;
         //Colocando na ultima versão do noh
         while(n->prox_versao != &sentinela){
             n = n->prox_versao;
