@@ -987,13 +987,17 @@ class ArvoreRN{
         return buscar_rec(raiz_versao[v], k, v);
     }
 
-    void imprimir(int v){
+    void imprimir(int v, int v_atual){
 
         if(v >= QTDE_VERSOES-1){
-            cout << "Não há como imprimir essa versão\n";
+            cout << "Não há como imprimir essa versão.\n";
+            cout << "O limite de versões é " << QTDE_VERSOES-1 << "\n";
         }
 
         else{
+            
+            if(v > v_atual) v = v_atual;
+
             imprimir_rec(raiz_versao[v], v, 0);
 
             cout << "\n";
@@ -1022,7 +1026,10 @@ class ArvoreRN{
         return y->chave;
     }*/
     
-    int sucessor(int k, int v){
+    int sucessor(int k, int v, int v_atual){
+
+        if (v > v_atual) v = v_atual;
+
         Noh* pos = buscar(k, v);
 
         if(pos == &sentinela){
@@ -1124,7 +1131,6 @@ int main(int nargs, char* argv[]){
 
     string s;
 
-
     ArvoreRN T;
     int v = 0;
 
@@ -1135,11 +1141,29 @@ int main(int nargs, char* argv[]){
             }
 
             if("IMP" == s.substr(0,3)){
-                T.imprimir(stoi(s.substr(4)));
+                T.imprimir(stoi(s.substr(4)), v);
             }
 
             if("REM" == s.substr(0,3)){
                 T.deletar(stoi(s.substr(4)), v);
+            }
+
+            if("SUC" == s.substr(0,3)){
+                //sucessor_arvore(T, v, s.substr(4));
+                string n1;
+
+                int i = 4;
+                while(s[i] != ' '){
+                    n1.push_back(s[i]);
+                    i = i + 1;
+                }
+
+                string n2 = s.substr(i+1);
+
+                int res =  T.sucessor(stoi(n1), stoi(n2), v);
+
+                if(res == INT_MAX) cout << "INFINITO\n";
+                else cout << res << "\n";
             }
         }
     }
