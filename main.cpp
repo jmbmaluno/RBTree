@@ -1,5 +1,6 @@
 #include <iostream>
 #include <climits>
+#include <fstream>
 
 #define QTDE_MODS 6
 #define QTDE_VERSOES 100
@@ -390,17 +391,20 @@ class ArvoreRN{
         //TEM QUE ATUALIZAR O VETOR DE RAIZES DAS VERSOES
     }
 
-    void imprimir_rec(Noh* r, int v){
+    void imprimir_rec(Noh* r, int v, int i){
+        
+        if(r != &sentinela){
+            if(ler(r, {ESQ}, v).p  != &sentinela){
+                imprimir_rec(ler(r, {ESQ}, v).p, v, i+1);
+            }
 
-        if(ler_impressao(r, {ESQ}, v).p  != &sentinela){
-            imprimir_rec(ler_impressao(r, {ESQ}, v).p, v);
-        }
+            cout << ler(r, {CHAVE}, v).k
+                << "," << i
+                << ","  << ler(r, {COR}, v).c << "  ";
 
-        cout << "Chave: " << ler_impressao(r, {CHAVE}, v).k 
-             << " Cor: "  << ler_impressao(r, {COR}, v).c << "\n";
-
-        if(ler_impressao(r, {DIR}, v).p != &sentinela){
-            imprimir_rec(ler_impressao(r, {DIR}, v).p, v);
+            if(ler(r, {DIR}, v).p != &sentinela){
+                imprimir_rec(ler(r, {DIR}, v).p, v, i+1);
+            }
         }
     }
 
@@ -760,16 +764,16 @@ class ArvoreRN{
             return &sentinela;
         }
 
-        if(ler_impressao(r, CHAVE, v).k == k){
+        if(ler(r, CHAVE, v).k == k){
             return r;
         }
 
-        if(ler_impressao(r, CHAVE, v).k < k){
-            return buscar_rec(ler_impressao(r, DIR, v).p, k, v);
+        if(ler(r, CHAVE, v).k < k){
+            return buscar_rec(ler(r, DIR, v).p, k, v);
         }
 
         else{
-            return buscar_rec(ler_impressao(r, ESQ, v).p, k, v);
+            return buscar_rec(ler(r, ESQ, v).p, k, v);
         }
     }
 
@@ -975,7 +979,6 @@ class ArvoreRN{
         }
 
         if(y_original_cor == 'b'){
-            cout << "vim pra ca\n";
             delete_fixup(x, v);
         }
     }
@@ -991,14 +994,13 @@ class ArvoreRN{
         }
 
         else{
-            cout << "ÁRVORE VERSÂO " << v << "\n";
-
-            imprimir_rec(raiz_versao[v], v);
+            imprimir_rec(raiz_versao[v], v, 0);
 
             cout << "\n";
         }
     }
 
+    /*
     int sucessor(int k, int v){
         Noh* pos = buscar(k, v);
 
@@ -1018,8 +1020,28 @@ class ArvoreRN{
         }
 
         return y->chave;
-    }
+    }*/
     
+    int sucessor(int k, int v){
+        Noh* pos = buscar(k, v);
+
+        if(pos == &sentinela){
+            return INT_MAX;
+        }
+
+        if(ler(pos, DIR, v).p != &sentinela){
+            return ler(minimo(ler(pos, DIR, v).p, v), CHAVE, v).k;
+        }
+
+        Noh* y = ler(pos, PAI, v).p;
+
+        while(y != &sentinela && pos == ler(y, DIR, v).p){
+            pos = y;
+            y = ler(y, PAI, v).p;
+        }
+
+        return ler(y, CHAVE, v).k;
+    }
 
     //Destrutor da árvore
     void Deletar(Noh* r, int& v){
@@ -1088,57 +1110,39 @@ class ArvoreRN{
 };
 
 
-int main(){
+int main(int nargs, char* argv[]){
+
+    if(nargs <= 1){
+        cout << "não há argumentos suficientes para o programa rodar\n";
+        cout << "Tente colocar como argumento o txt para executar ações na árvore\n";
+        return 1;
+    }
+
+    string entrada = argv[1];
+
+    ifstream arq (entrada.data());
+
+    string s;
+
 
     ArvoreRN T;
-    
     int v = 0;
-    
-    
-    T.inserir(1, v);
-    T.inserir(2, v);
-    T.inserir(3, v);
-    T.inserir(5, v);
 
-    T.teste(v);
+    while(!arq.eof()){
+        if(getline(arq, s)){
+            if("INC" == s.substr(0,3)){ 
+                T.inserir(stoi(s.substr(4)), v);
+            }
 
-    //T.deletar(5, v);
+            if("IMP" == s.substr(0,3)){
+                T.imprimir(stoi(s.substr(4)));
+            }
 
-    T.imprimir(v);
-    
-    
-    /*
-    for(int i = 1; i < 102; i++){
-        T.inserir(i, v);
-        T.imprimir(v);
-    }*/
-    
-
-    //T.inserir(-1, v);
-    //T.inserir(3, v);
-    //T.inserir(4, v);
-    
-    //T.teste(v);
-    
+            if("REM" == s.substr(0,3)){
+                T.deletar(stoi(s.substr(4)), v);
+            }
+        }
+    }
 
 }
 
-/*
-    Caso o set seja de CHAVE, eu preciso balancear o noh, para continuar atendendo
-    a propriedade de rubro negra (provavelmente vou ter que fazer o inserir noh).
-
-    Então eu tenho que ajustar o inserir noh para depois balancear o set.
-
-    Depois falta ajustar o Deletar noh.
-
-    Depois formatar conforme a saida que o trabalho pede
-*/
-
-//FALTA TERMINAR O INSERIR
-
-
-/*
-    Eu acho que to com problema no set.
-    quando eu duplico eu tenho que ter algum jeito de retornar o pontiero para o novo no
-    mas eu n to conseguinto atualizar
-*/
