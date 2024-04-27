@@ -108,8 +108,6 @@ class ArvoreRN{
     }
 
     
-    //Falta mexer nos campos de retorno de quem aponta para o noh duplicado
-    //Falta fazer o controle de versões
     //Eu quero que a versão mude apenas quando eu for inserir ou retirar um noh
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
     void set(Noh* n, Tag campo, int& v, Valor valor){
@@ -150,7 +148,6 @@ class ArvoreRN{
 
         //Caso não tenha espaço no mods
         else{
-            //cout << "não tem espaço\n";
             //Duplicando o no
             Noh* novo = new Noh {ler(n, {CHAVE}, v).k, 
                                  ler(n, {COR}  , v).c, 
@@ -214,7 +211,6 @@ class ArvoreRN{
 
                     //Caso N seja filho dir
                     else{
-                        //cout << ler(ler(pai, DIR, v).p, CHAVE, v).k << "\n";
                         set(pai, DIR, v, val);
                     }
                 }
@@ -227,13 +223,10 @@ class ArvoreRN{
             //Avisando para os filhos trocarem de pai
 
             if(esq != &sentinela){
-                //cout << ler(dir, CHAVE, v).k << "\n";
-
                 set(esq, PAI, v, val);
             }
 
             if(dir != &sentinela){
-                //cout << ler(dir, CHAVE, v).k << "\n";
                 set(dir, PAI, v, val);
             }
 
@@ -241,7 +234,6 @@ class ArvoreRN{
         }
     }
 
-    //MUDAR O ALGORITMO DA ROTAÇÂO PRA FICAR IGUAL AO DO CORMEN
     //Rotação ensinada pelo Cormen
     /*
     void rotacionar_esq(Noh* x){
@@ -320,7 +312,6 @@ class ArvoreRN{
 
         val.p = {y};
         set(x, PAI, v, val);
-        //TEM QUE ATUALIZAR O VETOR DE RAIZES DAS VERSOES
     }
 
     //Rotação a direita
@@ -393,7 +384,6 @@ class ArvoreRN{
 
         val.p = {y};
         set(x, PAI, v, val);
-        //TEM QUE ATUALIZAR O VETOR DE RAIZES DAS VERSOES
     }
 
     void imprimir_rec(Noh* r, int v, int i){
@@ -416,10 +406,7 @@ class ArvoreRN{
     
     void inserir_fixup(Noh* n, int& v){
 
-        //Noh* pai = ler(n,PAI,v).p;
         Valor val;
-
-        //if(v == 4) (v);
 
 
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
@@ -498,23 +485,9 @@ class ArvoreRN{
         
         }
 
-        //cout << ler(n, CHAVE, v).k << "\n";
-        //cout << ler(raiz_versao[v], CHAVE, v).k << "\n";
         val.c = {'b'};
 
-        /*
-        if(v == 3){
-            if(raiz_versao[3] == &sentinela){
-                cout << "eh sentinela\n";
-            }
-            else{
-                cout << ler(ler(raiz_versao[2], DIR, 2).p, CHAVE, 2).k << "\n"; 
-            }
-        }*/
-        //EU ACHO QUE TO COM ALGUM PONTEIRO PERDIDO POR AÍ. PRECISO
         set(raiz_versao[v], COR, v, val);
-        //TÁ DANDO ERRADO AQUI NO FIXUP A RAIZ TÁ FICANDO SEMPRE PRETA
-        //NA PRIMEIRA VERSÂO ISSO TÁ ERRADO
     }
 
     /*
@@ -802,7 +775,6 @@ class ArvoreRN{
     //Não textei pq tenho que mexer no fixup ainda
     void inserir(int k, int& v){
 
-
         if(v >= QTDE_VERSOES-1){
             cout << "NÃO HÁ ESPAÇO PARA NOVAS VERSÔES\n";
             return;
@@ -844,9 +816,6 @@ class ArvoreRN{
         Valor val;
         val.p = {y};
         
-
-        //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
-
         if(y == &sentinela){
             sentinela.pai = n;
             raiz_versao[v] = n; 
@@ -996,7 +965,7 @@ class ArvoreRN{
 
     void imprimir(int v, int v_atual){
 
-        if(v >= QTDE_VERSOES-1){
+        if(v > QTDE_VERSOES-1){
             cout << "Não há como imprimir essa versão.\n";
             cout << "O limite de versões é " << QTDE_VERSOES-1 << "\n";
         }
@@ -1072,55 +1041,6 @@ class ArvoreRN{
             Deletar(raiz_versao[i], i);    
     }*/
 
-
-
-    //ler(Noh* n, Tag campo, int v)
-    //set (Noh* n, Tag campo, int& v, Valor valor)
-    void teste(int& v){    
-        Noh * dir = ler(raiz_versao[v], DIR, v).p;
-        Noh* dirdir = ler(dir, DIR, v).p;
-
-        cout << "dir: " << ler(dir, CHAVE, v).k << "\n";
-        cout << "dirdir: " << ler(dirdir, CHAVE, v).k << "\n";
-        /*
-        set(raiz_versao[v], CHAVE, v, {2});
-        set(raiz_versao[v], CHAVE, v, {3});
-        set(raiz_versao[v], CHAVE, v, {5});
-        set(raiz_versao[v], CHAVE, v, {6});
-        set(raiz_versao[v], CHAVE, v, {7});
-        set(raiz_versao[v], CHAVE, v, {8});
-        set(raiz_versao[v], CHAVE, v, {9});
-        set(raiz_versao[v], CHAVE, v, {10});
-        set(raiz_versao[v], CHAVE, v, {11});
-
-        Noh* n = ler(raiz_versao[v], DIR, v).p;
-        set(n, CHAVE, v, {4});
-        set(n, CHAVE, v, {5});
-        set(n, CHAVE, v, {6});
-        set(n, CHAVE, v, {7});
-        set(n, CHAVE, v, {8});
-        set(n, CHAVE, v, {9});
-        set(n, CHAVE, v, {20});
-        set(n, CHAVE, v, {43});
-        set(n, CHAVE, v, {2});
-        set(n, CHAVE, v, {14});
-        set(n, CHAVE, v, {5});
-        set(n, CHAVE, v, {565});
-        set(n, CHAVE, v, {15});
-
-        //set(raiz_versao[v], CHAVE, v, {5});
-        if(raiz_versao[v] == &sentinela){
-            cout << "eh sentinela\n";
-        }
-
-        else{
-            imprimir(v);
-        }        
-        //inserir(5, v);
-        //imprimir(v);
-        */
-
-    }   
 };
 
 
@@ -1156,7 +1076,6 @@ int main(int nargs, char* argv[]){
             }
 
             if("SUC" == s.substr(0,3)){
-                //sucessor_arvore(T, v, s.substr(4));
                 string n1;
 
                 int i = 4;
