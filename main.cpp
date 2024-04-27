@@ -114,7 +114,11 @@ class ArvoreRN{
     //As mudanças de ponteiro de pai e filho e cor não devem alterar a versão
     void set(Noh* n, Tag campo, int& v, Valor valor){
         
-        if (n == &sentinela) return;
+        if (n == &sentinela){
+            if (campo == PAI) n->pai = valor.p;
+            return;
+        }
+
         //Colocando na ultima versão do noh
         while(n->prox_versao != &sentinela){
             n = n->prox_versao;
@@ -671,7 +675,9 @@ class ArvoreRN{
 
                 if(ler(ler(w, ESQ, v).p, COR, v).c == 'b' &&
                    ler(ler(w, DIR, v).p, COR, v).c == 'b'){
-                    
+
+                    Noh* aux = x;
+
                     val.c = 'r';
                     set(w, COR, v, val);
 
