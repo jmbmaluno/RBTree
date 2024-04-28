@@ -31,7 +31,7 @@ class ArvoreRN{
     //Estrutura do noh
     //Os campos de retorno e formado por apenas um no, ja que em uma arvore, cada no recebe em apontado por no max 1 ponteiro
     //Portanto, o campo de modificações terá apenas 2 espaços
-    struct Noh{int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Noh* prox_versao; Mod Mods[QTDE_MODS];};
+    struct Noh{int versao_criacao; int chave; char cor; Noh* esq; Noh* dir; Noh* pai; Noh* retorno; Noh* prox_versao; Mod Mods[QTDE_MODS];};
 
     //Criando um nó sentinela, assim como o Cormen
     //O noh sentinela vai representar as folhas nulas e será o pai da raiz
@@ -78,7 +78,7 @@ class ArvoreRN{
         
 
         //Coloando na ultima versão do no;
-        while (n->prox_versao != &sentinela){
+        while (n->prox_versao != &sentinela && n->prox_versao->versao_criacao <= v){
             n = n->prox_versao;
         }
 
@@ -149,7 +149,8 @@ class ArvoreRN{
         //Caso não tenha espaço no mods
         else{
             //Duplicando o no
-            Noh* novo = new Noh {ler(n, {CHAVE}, v).k, 
+            Noh* novo = new Noh {v,
+                                 ler(n, {CHAVE}, v).k, 
                                  ler(n, {COR}  , v).c, 
                                  ler(n, {ESQ}  , v).p, 
                                  ler(n, {DIR}  , v).p,
@@ -780,7 +781,7 @@ class ArvoreRN{
             return;
         }
 
-        Noh *n =  new Noh {k, 'r', &sentinela, &sentinela, 
+        Noh *n =  new Noh {v, k, 'r', &sentinela, &sentinela, 
                                    &sentinela, &sentinela, &sentinela,
                            {
                              {-1, {NULO}, {0}},{-1, {NULO}, {0}},
