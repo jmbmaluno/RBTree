@@ -37,43 +37,6 @@ class ArvoreRN{
     //O noh sentinela vai representar as folhas nulas
     Noh sentinela;
 
-    
-    Valor ler_impressao(Noh* n, Tag campo, int v){
-        
-        Valor resposta;
-
-        switch(campo){
-            case CHAVE: resposta.k = n->chave; break;
-            case COR:   resposta.c = n->cor;   break;
-            case PAI:   resposta.p = n->pai;   break;
-            case ESQ:   resposta.p = n->esq;   break;
-            case DIR:   resposta.p = n->dir;   break;
-        };
-
-        int j = -1;
-        int v_aux = 0;
-
-        for(int i = 0; i < QTDE_MODS; i++){
-            if(n->Mods[i].tag    == campo and 
-               n->Mods[i].versao <= v     and 
-               n->Mods[i].versao >  v_aux){
-
-                v_aux = n->Mods[i].versao;
-                j = i;
-            }
-        }
-
-        if(j != -1){
-            switch(campo){
-                case CHAVE: resposta.k = n->Mods[j].valor.k;   break;
-                case COR:   resposta.c = n->Mods[j].valor.c;   break;
-                default:    resposta.p = n->Mods[j].valor.p;   break;
-            }
-        }
-
-        return resposta;
-    }
-
     Valor ler(Noh* n, Tag campo, int v){
         
 
