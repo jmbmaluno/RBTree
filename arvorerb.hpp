@@ -373,74 +373,75 @@ class ArvoreRN{
 
 
         while (ler(ler(n,PAI,v).p, COR, v).c == 'r'){
-            Noh* pai = ler(n, PAI, v).p;
+            //Noh* pai = ler(n, PAI, v).p;
 
-            if (pai == ler(ler(pai, PAI, v).p, ESQ, v).p){
+            if (ler(n, PAI, v).p == ler(ler(ler(n, PAI, v).p, PAI, v).p, ESQ, v).p){
                 
-                Noh* y = ler(ler(pai, PAI, v).p, DIR, v).p;
+                //if(v == 13) cout << "vim aqui para a v13\n";
+                //cout << ler(ler(n,PAI,v).p, CHAVE, v).k << "\n";
+                Noh* y = ler(ler(ler(n, PAI, v).p, PAI, v).p, DIR, v).p;
                 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
-                    set(pai, COR, v, val);
+                    set(ler(n, PAI, v).p, COR, v, val);
 
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n, PAI, v).p, PAI, v).p, COR, v, val);
                     
-                    n = ler(pai, PAI, v).p;
+                    n = ler(ler(n, PAI, v).p, PAI, v).p;
                 }
 
                 
                 else{
 
-                    if(n == ler(pai, DIR, v).p){
-                        n = pai;
+                    if(n == ler(ler(n, PAI, v).p, DIR, v).p){
+                        n = ler(n, PAI, v).p;
                         rotacionar_esq(n, v);
                     }
 
                     val.c = {'b'};
 
-                    set(pai, COR, v, val);
+                    set(ler(n, PAI, v).p, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n, PAI, v).p, PAI, v).p, COR, v, val);
 
-                    rotacionar_dir(ler(pai, PAI, v).p, v);
+                    rotacionar_dir(ler(ler(n, PAI, v).p, PAI, v).p, v);
                 }
             }
 
             //continuar com set e get
-            else{
-                Noh* y = ler(ler(pai, PAI, v).p, ESQ, v).p;
+            else{                
+                Noh* y = ler(ler(ler(n, PAI, v).p, PAI, v).p, ESQ, v).p;
 
                 if(ler(y, COR, v).c == 'r'){
                     val.c = {'b'};
-                    set(pai, COR, v, val);
-
+                    set(ler(n, PAI, v).p, COR, v, val);
                     set(y, COR, v, val);
                     
                     val.c = {'r'};
-                    set(ler(pai, PAI, v).p, COR, v, val);
+                    set(ler(ler(n, PAI, v).p, PAI, v).p, COR, v, val);
     
-                    n = ler(pai, PAI, v).p;
+                    n = ler(ler(n, PAI, v).p, PAI, v).p;
                 }
 
                 
                 else{
 
-                    if(n == ler(pai, ESQ, v).p){
-                        n = pai;
+                    if(n == ler(ler(n, PAI, v).p, ESQ, v).p){
+                        n = ler(n, PAI, v).p;
                         rotacionar_dir(n, v);
                     }
+
                     val.c = {'b'};
+                    set(ler(n, PAI, v).p, COR, v, val);
 
-                    set(pai, COR, v, val);
                     val.c = {'r'};
+                    set(ler(ler(n, PAI, v).p, PAI, v).p, COR, v, val);
 
-                    set(ler(pai, PAI, v).p, COR, v, val);
-
-                    rotacionar_esq(ler(pai, PAI, v).p, v);
+                    rotacionar_esq(ler(ler(n, PAI, v).p, PAI, v).p, v);
 
                 }      
             }
@@ -900,18 +901,19 @@ class ArvoreRN{
                 else{
                     val.p = y;
                     set(x, PAI, v, val);
-
-                    transplantar(z, y, v);
-
-                    val.p = ler(z, ESQ, v).p;
-                    set(y, ESQ, v, val);
-
-                    val.p = y;
-                    set(ler(y, ESQ, v).p, PAI, v, val);
-
-                    val.c = ler(z, COR, v).c;
-                    set(y, COR, v, val);
                 }
+
+                transplantar(z, y, v);
+
+                val.p = ler(z, ESQ, v).p;
+                set(y, ESQ, v, val);
+
+                val.p = y;
+                set(ler(y, ESQ, v).p, PAI, v, val);
+
+                val.c = ler(z, COR, v).c;
+                set(y, COR, v, val);
+                
             }
         }
 
